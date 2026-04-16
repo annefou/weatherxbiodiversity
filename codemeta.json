@@ -1,0 +1,63 @@
+{
+  "@context": "https://doi.org/10.5063/schema/codemeta-2.0",
+  "@type": "SoftwareSourceCode",
+  "name": "WeatherXBiodiversity: Soroye et al. (2020) Replication for Iberian Bombus",
+  "description": "Replication of Soroye, Newbold & Kerr (2020, Science) for Iberian Bombus using GBIF occurrence data and ERA5 climate reanalysis. Tests whether climate departure predicts bumblebee local extinction.",
+  "version": "0.1.0",
+  "dateCreated": "2026-04-14",
+  "dateModified": "2026-04-16",
+  "license": "https://spdx.org/licenses/MIT",
+  "codeRepository": "https://github.com/annefou/weatherxbiodiversity",
+  "programmingLanguage": {
+    "@type": "ComputerLanguage",
+    "name": "Python",
+    "version": "3.12"
+  },
+  "operatingSystem": ["Linux", "macOS"],
+  "author": [
+    {
+      "@type": "Person",
+      "givenName": "Anne",
+      "familyName": "Fouilloux",
+      "@id": "https://orcid.org/0000-0002-1784-2920",
+      "affiliation": {
+        "@type": "Organization",
+        "name": "LifeWatch ERIC"
+      }
+    }
+  ],
+  "keywords": [
+    "bumblebee",
+    "Bombus",
+    "climate change",
+    "ERA5",
+    "GBIF",
+    "species distribution",
+    "replication study",
+    "FORRT",
+    "Iberian Peninsula",
+    "agro-ecology"
+  ],
+  "softwareRequirements": [
+    "python >=3.12",
+    "xarray",
+    "pandas",
+    "cdsapi",
+    "pyproj",
+    "statsmodels",
+    "scipy",
+    "matplotlib"
+  ],
+  "referencePublication": {
+    "@type": "ScholarlyArticle",
+    "name": "Climate change contributes to widespread declines among bumble bees across continents",
+    "author": ["Peter Soroye", "Tim Newbold", "Jeremy Kerr"],
+    "datePublished": "2020",
+    "@id": "https://doi.org/10.1126/science.aax8591"
+  },
+  "isPartOf": {
+    "@type": "Organization",
+    "name": "Science Live",
+    "url": "https://platform.sciencelive4all.org"
+  }
+}

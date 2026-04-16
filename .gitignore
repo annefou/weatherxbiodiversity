@@ -1,0 +1,19 @@
+# Data (large files — download via pipeline)
+data/
+!data/.gitkeep
+
+# Results (generated)
+results/
+!results/.gitkeep
+
+# Python
+__pycache__/
+*.pyc
+.ipynb_checkpoints/
+
+# Jupyter notebooks generated from Jupytext
+notebooks/*.ipynb
+
+# Environment
+.env
+*.egg-info/

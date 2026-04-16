@@ -1,0 +1,40 @@
+cff-version: 1.2.0
+title: "WeatherXBiodiversity: Soroye et al. (2020) Replication for Iberian Bombus"
+message: "If you use this software, please cite it as below."
+type: software
+authors:
+  - family-names: Fouilloux
+    given-names: Anne
+    orcid: "https://orcid.org/0000-0002-1784-2920"
+    affiliation: "LifeWatch ERIC"
+repository-code: "https://github.com/annefou/weatherxbiodiversity"
+license: MIT
+version: "0.1.0"
+date-released: "2026-04-16"
+keywords:
+  - bumblebee
+  - Bombus
+  - climate change
+  - ERA5
+  - GBIF
+  - species distribution
+  - climate departure
+  - replication study
+  - FORRT
+  - Iberian Peninsula
+references:
+  - type: article
+    title: "Climate change contributes to widespread declines among bumble bees across continents"
+    authors:
+      - family-names: Soroye
+        given-names: Peter
+      - family-names: Newbold
+        given-names: Tim
+      - family-names: Kerr
+        given-names: Jeremy
+    year: 2020
+    doi: "10.1126/science.aax8591"
+    journal: "Science"
+    volume: 367
+    start: 685
+    end: 688

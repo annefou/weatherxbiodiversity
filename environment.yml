@@ -1,0 +1,21 @@
+name: weatherxbio
+channels:
+  - conda-forge
+dependencies:
+  - python=3.12
+  - xarray>=2024.6
+  - pandas>=2.0
+  - numpy
+  - matplotlib
+  - scipy
+  - statsmodels
+  - pyproj
+  - netcdf4
+  - cdsapi
+  - requests
+  - jupytext
+  - jupyterlab
+  - snakemake-minimal
+  - pip
+  - pip:
+    - pygbif
