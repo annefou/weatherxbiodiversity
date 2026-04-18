@@ -2,8 +2,9 @@
 data/
 !data/.gitkeep
 
-# Results (generated)
-results/
+# Results (large files)
+results/*.pth
+results/logs/
 !results/.gitkeep
 
 # Python
