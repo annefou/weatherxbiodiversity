@@ -10,9 +10,6 @@ project:
   license: MIT
   toc:
     - file: index.md
-    - file: soroye_port/phase2_forest.png
-    - file: soroye_port/phase3_forest.png
 
 site:
   title: "WeatherXBiodiversity — Soroye 2020 Replication"
-  base_url: /weatherxbiodiversity
