@@ -16,7 +16,7 @@ dependencies:
   - requests
   - jupytext
   - jupyterlab
-  - snakemake-minimal
+  - snakemake
   - pip
   - pip:
     - pygbif
