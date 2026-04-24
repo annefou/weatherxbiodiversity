@@ -16,7 +16,8 @@ dependencies:
   - requests
   - jupytext
   - jupyterlab
-  - snakemake
   - pip
   - pip:
     - pygbif
+    # snakemake installed via pip to avoid conda-forge solver issues
+    - snakemake
