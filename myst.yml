@@ -1,0 +1,18 @@
+version: 1
+project:
+  title: "WeatherXBiodiversity — Soroye 2020 replication on Iberia"
+  authors:
+    - name: Anne Fouilloux
+      orcid: 0000-0002-1784-2920
+      affiliations:
+        - LifeWatch ERIC
+  github: https://github.com/annefou/weatherxbiodiversity
+  license: MIT
+  toc:
+    - file: index.md
+    - file: soroye_port/phase2_forest.png
+    - file: soroye_port/phase3_forest.png
+
+site:
+  title: "WeatherXBiodiversity — Soroye 2020 Replication"
+  base_url: /weatherxbiodiversity

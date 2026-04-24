@@ -9,8 +9,8 @@ authors:
     affiliation: "LifeWatch ERIC"
 repository-code: "https://github.com/annefou/weatherxbiodiversity"
 license: MIT
-version: "0.1.0"
-date-released: "2026-04-16"
+version: "0.2.0"
+date-released: "2026-04-24"
 keywords:
   - bumblebee
   - Bombus

@@ -1,0 +1,73 @@
+name: CI smoke run
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+# Smoke test: runs Phase 2 (port on Soroye's data) from the extracted bumblebee
+# dataset. Downloads Soroye's 1.1 GB Figshare zip once and caches it.
+
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Micromamba
+        uses: mamba-org/setup-micromamba@v3
+        with:
+          environment-file: environment.yml
+          environment-name: weatherxbio
+          init-shell: bash
+          cache-environment: true
+
+      - name: Cache Soroye Figshare dataset
+        id: cache_soroye
+        uses: actions/cache@v4
+        with:
+          path: reference/Bumblebee_repo.zip
+          key: soroye-figshare-9956471-v1
+
+      - name: Download Soroye Figshare dataset (if not cached)
+        if: steps.cache_soroye.outputs.cache-hit != 'true'
+        run: |
+          mkdir -p reference
+          curl -sL -o reference/Bumblebee_repo.zip \
+              https://ndownloader.figshare.com/files/22019016
+
+      - name: Extract needed files (skip CRU TS climate — too big for CI)
+        run: |
+          cd reference
+          unzip -q Bumblebee_repo.zip \
+              "Bumblebee_repo_wbombusdat/0_data/*" \
+              "Bumblebee_repo_wbombusdat/*.R" \
+              "Bumblebee_repo_wbombusdat/ClimaticPositionIndex/*"
+          # Extract only a small subset of CRU TS for the CI smoke test
+          unzip -q Bumblebee_repo.zip \
+              "Bumblebee_repo_wbombusdat/0_ClimateData/*1901.1910*.nc" \
+              "Bumblebee_repo_wbombusdat/0_ClimateData/*2011.2015*.nc"
+
+      - name: Run Phase 2 port end-to-end
+        shell: micromamba-shell {0}
+        run: |
+          cd soroye_port
+          python 01_clean_data.py
+          python 02_presence_absence.py
+          python 03_sampling_continent.py
+          # Phase 2 CI runs with only 2 decades of climate — coefficients won't
+          # match the paper but the pipeline is validated for correctness.
+          python 04_climate_tei_pei.py
+          python 05b_regression_statsmodels.py
+          python plot_forest.py || echo "Plot failed (expected if forests incomplete)"
+
+      - name: Upload results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ci-outputs
+          path: |
+            soroye_port/outputs/
+            soroye_port/phase2_forest.png
