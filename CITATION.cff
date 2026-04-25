@@ -9,7 +9,7 @@ authors:
     affiliation: "LifeWatch ERIC"
 repository-code: "https://github.com/annefou/weatherxbiodiversity"
 license: MIT
-version: "0.2.0"
+version: "0.2.1"
 date-released: "2026-04-25"
 doi: "10.5281/zenodo.19756173"
 identifiers:
@@ -22,6 +22,9 @@ identifiers:
   - type: doi
     value: "10.5281/zenodo.19756286"
     description: "Docker container image (v0.2.0)"
+  - type: doi
+    value: "10.15468/dl.3frmsq"
+    description: "GBIF download DOI for Phase 3 Bombus Iberia data (36,560 records)"
 keywords:
   - bumblebee
   - Bombus

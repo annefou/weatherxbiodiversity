@@ -2,7 +2,11 @@
 Phase 3 / Iberia adaptation of 01_clean_data.py
 
 Differences from the Phase-2 script:
-  - Input = GBIF Iberia CSV (different column names)
+  - Input = GBIF download SIMPLE_CSV (tab-separated despite the .csv extension)
+    obtained via the GBIF Occurrence Download API and pinned to a citable DOI.
+    DOI: https://doi.org/10.15468/dl.3frmsq
+    Citation: GBIF.org (2026-04-25) GBIF Occurrence Download
+              https://doi.org/10.15468/dl.3frmsq
   - Species column has "Bombus X" prefix — strip it
   - Period is extended: we use the baseline and recent windows that align with
     Soroye (1901-1974 / 2000-2014), but GBIF Iberia's baseline coverage is thin
@@ -19,7 +23,7 @@ import pandas as pd
 
 ROOT = Path(__file__).resolve().parent.parent
 REF = ROOT / 'reference' / 'Bumblebee_repo_wbombusdat'
-GBIF_CSV = ROOT / 'data' / 'gbif_bombus_iberia.csv'
+GBIF_CSV = ROOT / 'data' / 'gbif_dl' / '0006204-260423192947929.csv'
 KERR_SPP_CSV = REF / '0_data' / 'Kerr_et_al2015_spplist.csv'
 ERR_OBS_CSV = REF / '0_data' / 'bombus_err_obs.csv'
 
@@ -31,7 +35,7 @@ OUT_CLEAN = OUT_DIR / 'bombus_clean.csv'
 # 1. Load raw GBIF
 
 print('Loading GBIF Iberia data …')
-gbif = pd.read_csv(GBIF_CSV, low_memory=False)
+gbif = pd.read_csv(GBIF_CSV, sep='\t', low_memory=False)
 print(f'  raw: {len(gbif):,} rows')
 
 # Rename columns to match Soroye's schema

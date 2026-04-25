@@ -2,6 +2,7 @@
 
 [![Source DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.19756173.svg)](https://doi.org/10.5281/zenodo.19756173)
 [![Docker image DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.19756286.svg)](https://doi.org/10.5281/zenodo.19756286)
+[![GBIF DOI](https://img.shields.io/badge/GBIF-10.15468%2Fdl.3frmsq-blue.svg)](https://doi.org/10.15468/dl.3frmsq)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
 Replication of [Soroye, Newbold & Kerr (2020, *Science*)](https://doi.org/10.1126/science.aax8591) for Iberian *Bombus* using open GBIF occurrence data and CRU TS climate.
@@ -89,7 +90,7 @@ Scripts 02–05 take an `OUT_SUBDIR` env var (default `outputs`) to switch betwe
 
 ## Data sources
 
-- **Biodiversity**: [GBIF](https://www.gbif.org/) — *Bombus* occurrence records (Iberia)
+- **Biodiversity**: [GBIF Occurrence Download — *Bombus* in Spain + Portugal, georeferenced, no geospatial issues, 36,560 records](https://doi.org/10.15468/dl.3frmsq) — citation: *GBIF.org (2026-04-25) GBIF Occurrence Download https://doi.org/10.15468/dl.3frmsq* — fetched via `notebooks/01b_gbif_download_doi.py`
 - **Climate**: CRU TS 3.24.01 monthly (from Soroye's Figshare deposit) — used for both Phase 2 and Phase 3 to isolate region as the only swap variable
 - **Climate (future extension)**: [ERA5 via CDS](https://cds.climate.copernicus.eu/) — already downloaded locally for a future sensitivity run
 
