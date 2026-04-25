@@ -33,3 +33,6 @@ soroye_port/outputs_iberia/bombus_clean.csv
 
 # MyST build output
 _build/
+
+# Local copy of paywalled reference paper
+science.aax8591.pdf
