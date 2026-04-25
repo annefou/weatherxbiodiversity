@@ -1,65 +1,95 @@
-# WeatherXBiodiversity — Soroye 2020 replication on Iberia
+# WeatherXBiodiversity — does Soroye 2020's bumble bee–climate claim replicate?
 
-## Claim under test
+## What this site is
 
-[Soroye, Newbold & Kerr (2020, *Science*)](https://doi.org/10.1126/science.aax8591) reported that **increasing thermal-exposure frequency — the rate at which a location exceeds species-specific historical thermal tolerances — predicts local extinction of bumble bees** across North America and Europe.
+A FORRT (Framework for Open and Reproducible Research Training) replication
+study of [Soroye, Newbold & Kerr (2020, *Science*)](https://doi.org/10.1126/science.aax8591).
 
-This repository tests whether the claim replicates on the **Iberian Peninsula** using an independent Python re-implementation of the authors' R pipeline, open [GBIF](https://www.gbif.org/) occurrence data, and CRU TS 3.24.01 climate.
+The original paper claims that the *frequency* with which local temperatures
+exceed species-specific historical thermal tolerances — not just mean warming —
+predicts local extirpation of bumble bee species across North America and
+Europe. We test whether that claim:
 
-## Method
+1. **Reproduces** when the authors' R analysis is re-implemented in Python,
+   on the *same* underlying data, and
+2. **Replicates** when the same Python pipeline is applied to *independent*
+   open occurrence data for the Iberian Peninsula.
 
-A faithful Python port of Soroye's five R scripts lives in `soroye_port/`:
+Both tests come back **Validated, High confidence**, with the Iberian
+coefficient ~3× larger in magnitude than the continental mean.
 
-1. Clean bombus occurrences (species filter, synonym merge, IUCN exclusion list)
-2. Rasterise onto a 100 km cylindrical-equal-area grid per (species × period × season); infer absences from other-species sampling
-3. Compute per-cell sampling effort (distinct-LYID counts) summed across all six period-seasons; build the continent raster
-4. Derive per-species **Thermal Exposure Index (TEI)** and **Precipitation Exposure Index (PEI)** baseline + delta using bilinearly-interpolated CRU TS monthly climate
-5. Fit the mixed-effects logistic GLMM
-   ```
-   extinction ~ continent + sc_sampling
-     + sc_TEI_bs + sc_TEI_delta + sc_TEI_bs:sc_TEI_delta
-     + sc_PEI_bs + sc_PEI_delta + sc_PEI_bs:sc_PEI_delta
-     + sc_TEI_bs:sc_PEI_bs + sc_TEI_delta:sc_PEI_delta
-     + (1|species)
-   ```
+## Headline result
 
-## Results
+| Phase | Dataset | n | sc_TEI_delta (mixed VB) | 95 % CI |
+|---|---|---:|---:|:---:|
+| 2 — Reproduction | Soroye continental data | 13 614 | **+0.15** | [0.12, 0.19] |
+| 3 — Replication | Iberian *Bombus* via [GBIF](https://doi.org/10.15468/dl.3frmsq) | 528 | **+0.48** | [0.27, 0.69] |
 
-### Phase 2 — Python port validation on Soroye's own data
+The mechanism Soroye describes is real, and on the warm-edge subregion of
+Iberia it is *stronger* — exactly what one would predict if species reaching
+their thermal limit are most vulnerable to thermal-exposure events.
 
-Running the port on the authors' NA + Europe bombus dataset with CRU TS climate should reproduce the sign and significance of the published coefficients.
+## The full FORRT chain
 
-| | Coefficient | 95 % CI |
-|---|---:|---|
-| `sc_TEI_delta` | **+0.15** | [0.12, 0.19] |
+Nine nanopublications, all on [Science Live](https://platform.sciencelive4all.org):
 
-Sign matches Soroye's published claim — port is validated.
+```
+                        Soroye et al. 2020
+                              ▲
+              ┌───────────────┴───────────────┐
+              │                               │
+    Quote-with-comment  ───►  AIDA  ───►  FORRT Claim
+                                              │
+                                              │ (tested by)
+                                              │
+                          ┌───────────────────┴───────────────────┐
+                          ▼                                       ▼
+                Phase 2 Replication Study           Phase 3 Replication Study
+                    (Robustness)                       (Regional replicability)
+                          │                                       │
+                          ▼                                       ▼
+                 Phase 2 Outcome                          Phase 3 Outcome
+                  Validated / High                          Validated / High
+                          │                                       │
+                          ▼                                       ▼
+              CiTO confirms Soroye 2020              CiTO confirms Soroye 2020
+                          │                                       │
+                          └─────────────► Wikidata  ◄─────────────┘
+```
 
-![Phase 2 forest plot](soroye_port/phase2_forest.png)
+- **The claim level** is paper-rooted: a verbatim quote from Soroye's
+  Discussion is wrapped with a personal comment and an AIDA-format claim.
+- **Each Phase** has its own Replication Study + Outcome — Phase 2 swaps
+  *the analysis software* (R → Python) while keeping data fixed; Phase 3
+  swaps *the data* (continental → Iberian GBIF) while keeping software
+  fixed. Together they isolate two different senses of "the claim holds up."
+- **CiTO citations** wire each Outcome back to the original paper DOI so
+  the replication shows up downstream in [Wikidata / Scholia](https://scholia.toolforge.org/work/Q89582023).
 
-### Phase 3 — Iberia regional replication
+The next pages walk through each layer.
 
-Apply the same Python code to Iberian *Bombus* occurrences from GBIF (31 species, 528 rows) combined with CRU TS climate.
+## Quick links
 
-| | Coefficient | 95 % CI |
-|---|---:|---|
-| `sc_TEI_delta` | **+0.48** | [0.27, 0.69] |
+- [The Claim](claim.md) — Quote, AIDA, FORRT Claim
+- [Phase 2 — Reproduction on Soroye's data](phase2.md)
+- [Phase 3 — Iberian replication](phase3.md)
+- [Methods](methods.md) — Python port, grid, TEI/PEI, GLMM
+- [Discussion](discussion.md) — Why is Iberia stronger? What's next?
+- [References](references.md)
 
-**Soroye's claim replicates on Iberia** — TEI_delta positive, highly significant.
+## Reuse and citation
 
-![Phase 3 forest plot](soroye_port/phase3_forest.png)
+This work is meant to be *reused* — to project bumble bee extirpation risk
+onto future climate, to flag candidate climate refugia, or to extend the
+mechanism to other thermally-sensitive insect taxa. The validated pipeline
+is archived at [Zenodo](https://doi.org/10.5281/zenodo.19756173) and the
+GBIF download at [10.15468/dl.3frmsq](https://doi.org/10.15468/dl.3frmsq).
 
-## What replicating means here
-
-- **Reproduction** (same data, different code): our Python port recovers Soroye's positive TEI_delta on his North America + Europe dataset (Phase 2).
-- **Replication** (different data, same method): applying the validated port to Iberia GBIF + CRU TS also yields a positive, significant TEI_delta (Phase 3).
-
-Together these two tests support the generality of the thermal-exposure → extinction mechanism at the Iberian regional scale.
-
-## FORRT nanopub chain
-
-A full FORRT Replication chain (Research Question → AIDA sentence → Claim → Replication Study → Replication Outcome) is published on [Science Live](https://platform.sciencelive4all.org) referencing this work. URIs will be added here once the chain is finalised.
+If you build on this, please cite both the [original paper](https://doi.org/10.1126/science.aax8591) and this repository.
 
 ## Context
 
-Prepared for the [BioHackathon Europe 2026](https://biohackathon-europe.org/) project *WeatherXBiodiversity*, which packages cross-domain biodiversity × climate data as [ARC](https://arc-rdm.org/) / [RO-Crate](https://www.researchobject.org/ro-crate/) FAIR Digital Objects.
+Prepared for the [BioHackathon Europe 2026](https://biohackathon-europe.org/)
+project *WeatherXBiodiversity*, which packages cross-domain biodiversity ×
+climate data as [ARC](https://arc-rdm.org/) /
+[RO-Crate](https://www.researchobject.org/ro-crate/) FAIR Digital Objects.

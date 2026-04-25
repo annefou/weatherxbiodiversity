@@ -10,6 +10,12 @@ project:
   license: MIT
   toc:
     - file: index.md
+    - file: claim.md
+    - file: phase2.md
+    - file: phase3.md
+    - file: methods.md
+    - file: discussion.md
+    - file: references.md
 
 site:
   title: "WeatherXBiodiversity — Soroye 2020 Replication"
