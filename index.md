@@ -63,8 +63,14 @@ Nine nanopublications, all on [Science Live](https://platform.sciencelive4all.or
   *the analysis software* (R → Python) while keeping data fixed; Phase 3
   swaps *the data* (continental → Iberian GBIF) while keeping software
   fixed. Together they isolate two different senses of "the claim holds up."
-- **CiTO citations** wire each Outcome back to the original paper DOI so
-  the replication shows up downstream in [Wikidata / Scholia](https://scholia.toolforge.org/work/Q89582023).
+- **CiTO citations** wire each Outcome back to the original paper DOI as
+  typed citations (`cito:confirms`). This makes the replication
+  machine-readable in the open scholarly graph and makes it eligible for
+  downstream import into [Wikidata](https://www.wikidata.org/wiki/Q89582023) /
+  [Scholia](https://scholia.toolforge.org/work/Q89582023) via dedicated
+  pipelines such as [Egon Willighagen's](https://gist.github.com/egonw/379c72a49517716712b70bdee0d845ce);
+  inclusion there is gated by Wikidata's own notability criteria and
+  requires the import to be run.
 
 The next pages walk through each layer.
 

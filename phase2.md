@@ -60,8 +60,11 @@ intervals. Beyond the headline `sc_TEI_delta`, note:
 
 ### CiTO link to Soroye 2020
 
-The Outcome `cito:confirms` Soroye et al. 2020. This nanopub is what makes
-the validation visible to Wikidata / Scholia.
+The Outcome `cito:confirms` Soroye et al. 2020. This nanopub records the
+typed citation in machine-readable form and makes it eligible for
+downstream import into Wikidata / Scholia via dedicated pipelines —
+inclusion there is conditional on Wikidata's own notability criteria
+and on the import being run.
 
 <iframe src="https://platform.sciencelive4all.org/np/?uri=https://w3id.org/sciencelive/np/RAdvbQt3vXT0HpyNYdwwMBs8fVnmyv5KWFT0eXfVTDXg0"
         width="100%" height="500" style="border:1px solid #ddd;border-radius:4px;"></iframe>
