@@ -10,7 +10,18 @@ authors:
 repository-code: "https://github.com/annefou/weatherxbiodiversity"
 license: MIT
 version: "0.2.0"
-date-released: "2026-04-24"
+date-released: "2026-04-25"
+doi: "10.5281/zenodo.19756173"
+identifiers:
+  - type: doi
+    value: "10.5281/zenodo.19756173"
+    description: "Concept DOI (resolves to the latest version)"
+  - type: doi
+    value: "10.5281/zenodo.19756174"
+    description: "DOI for v0.2.0"
+  - type: doi
+    value: "10.5281/zenodo.19756286"
+    description: "Docker container image (v0.2.0)"
 keywords:
   - bumblebee
   - Bombus

@@ -1,5 +1,9 @@
 # WeatherXBiodiversity: Soroye et al. (2020) Replication
 
+[![Source DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.19756173.svg)](https://doi.org/10.5281/zenodo.19756173)
+[![Docker image DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.19756286.svg)](https://doi.org/10.5281/zenodo.19756286)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+
 Replication of [Soroye, Newbold & Kerr (2020, *Science*)](https://doi.org/10.1126/science.aax8591) for Iberian *Bombus* using open GBIF occurrence data and CRU TS climate.
 
 **Claim under test**: increasing frequency of temperatures exceeding historical baselines predicts local extinction of bumblebee species.
@@ -88,6 +92,40 @@ Scripts 02–05 take an `OUT_SUBDIR` env var (default `outputs`) to switch betwe
 - **Biodiversity**: [GBIF](https://www.gbif.org/) — *Bombus* occurrence records (Iberia)
 - **Climate**: CRU TS 3.24.01 monthly (from Soroye's Figshare deposit) — used for both Phase 2 and Phase 3 to isolate region as the only swap variable
 - **Climate (future extension)**: [ERA5 via CDS](https://cds.climate.copernicus.eu/) — already downloaded locally for a future sensitivity run
+
+## How to cite
+
+If you use this software, please cite both this repository (via its Zenodo
+concept DOI, which always resolves to the latest version) and Soroye et al.
+(2020).
+
+```
+Fouilloux, A. (2026). WeatherXBiodiversity: Soroye et al. (2020) Replication
+for Iberian Bombus (v0.2.0). Zenodo. https://doi.org/10.5281/zenodo.19756173
+```
+
+BibTeX:
+
+```bibtex
+@software{fouilloux_weatherxbiodiversity_2026,
+  author    = {Fouilloux, Anne},
+  title     = {{WeatherXBiodiversity: Soroye et al. (2020) Replication for Iberian Bombus}},
+  year      = {2026},
+  version   = {v0.2.0},
+  publisher = {Zenodo},
+  doi       = {10.5281/zenodo.19756173},
+  url       = {https://doi.org/10.5281/zenodo.19756173}
+}
+```
+
+The DOI `10.5281/zenodo.19756173` is the **concept DOI** — it always resolves
+to the latest release. Specific version DOIs are available on the
+[Zenodo record page](https://doi.org/10.5281/zenodo.19756173).
+
+The accompanying Docker container image is archived separately at
+[10.5281/zenodo.19756286](https://doi.org/10.5281/zenodo.19756286).
+
+See [`CITATION.cff`](CITATION.cff) for machine-readable citation metadata.
 
 ## Context
 

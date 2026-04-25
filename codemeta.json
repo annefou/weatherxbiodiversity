@@ -5,9 +5,11 @@
   "description": "Replication of Soroye, Newbold & Kerr (2020, Science) for Iberian Bombus using GBIF occurrence data and ERA5 climate reanalysis. Tests whether climate departure predicts bumblebee local extinction.",
   "version": "0.2.0",
   "dateCreated": "2026-04-14",
-  "dateModified": "2026-04-24",
+  "dateModified": "2026-04-25",
   "license": "https://spdx.org/licenses/MIT",
   "codeRepository": "https://github.com/annefou/weatherxbiodiversity",
+  "identifier": "https://doi.org/10.5281/zenodo.19756173",
+  "@id": "https://doi.org/10.5281/zenodo.19756173",
   "programmingLanguage": {
     "@type": "ComputerLanguage",
     "name": "Python",
