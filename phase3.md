@@ -53,22 +53,29 @@ Notable differences from Phase 2:
 
 ### Replication Study
 
-<iframe src="https://platform.sciencelive4all.org/np/?uri=https://w3id.org/sciencelive/np/RA51YMjEluCKKQWWIuB9_SBU88dgCaonVuqtS4CspPiUE"
-        width="100%" height="700" style="border:1px solid #ddd;border-radius:4px;"></iframe>
+<details>
+<summary>Show the Phase 3 Replication Study nanopub inline</summary>
+
+<iframe src="https://platform.sciencelive4all.org/np/?uri=https://w3id.org/sciencelive/np/RA51YMjEluCKKQWWIuB9_SBU88dgCaonVuqtS4CspPiUE" width="100%" height="1000" style="border:1px solid #ddd;border-radius:4px;"></iframe>
+
+</details>
 
 [View Phase 3 Study on Science Live →](https://platform.sciencelive4all.org/np/?uri=https://w3id.org/sciencelive/np/RA51YMjEluCKKQWWIuB9_SBU88dgCaonVuqtS4CspPiUE)
 
 ### Replication Outcome — Validated, High confidence
 
-<iframe src="https://platform.sciencelive4all.org/np/?uri=https://w3id.org/sciencelive/np/RAIylrhtnfTH_vtp1nTDVAiGsv2u_Ea4Uvh35DrGySuWs"
-        width="100%" height="700" style="border:1px solid #ddd;border-radius:4px;"></iframe>
+<details>
+<summary>Show the Phase 3 Replication Outcome nanopub inline</summary>
+
+<iframe src="https://platform.sciencelive4all.org/np/?uri=https://w3id.org/sciencelive/np/RAIylrhtnfTH_vtp1nTDVAiGsv2u_Ea4Uvh35DrGySuWs" width="100%" height="1000" style="border:1px solid #ddd;border-radius:4px;"></iframe>
+
+</details>
 
 [View Phase 3 Outcome on Science Live →](https://platform.sciencelive4all.org/np/?uri=https://w3id.org/sciencelive/np/RAIylrhtnfTH_vtp1nTDVAiGsv2u_Ea4Uvh35DrGySuWs)
 
 ### CiTO link to Soroye 2020
 
-<iframe src="https://platform.sciencelive4all.org/np/?uri=https://w3id.org/sciencelive/np/RApCQTLMP8h0jDYF9ggWU6lMTW7a_KG5_Jygbsx0aTpIo"
-        width="100%" height="500" style="border:1px solid #ddd;border-radius:4px;"></iframe>
+<iframe src="https://platform.sciencelive4all.org/np/?uri=https://w3id.org/sciencelive/np/RApCQTLMP8h0jDYF9ggWU6lMTW7a_KG5_Jygbsx0aTpIo" width="100%" height="600"></iframe>
 
 [View Phase 3 CiTO on Science Live →](https://platform.sciencelive4all.org/np/?uri=https://w3id.org/sciencelive/np/RApCQTLMP8h0jDYF9ggWU6lMTW7a_KG5_Jygbsx0aTpIo)
 

@@ -46,15 +46,23 @@ intervals. Beyond the headline `sc_TEI_delta`, note:
 
 ### Replication Study
 
-<iframe src="https://platform.sciencelive4all.org/np/?uri=https://w3id.org/sciencelive/np/RADLcvxDglyzEnEfAo9e6RfnXQ_YK3v_gJcnWLVBkIbP4"
-        width="100%" height="700" style="border:1px solid #ddd;border-radius:4px;"></iframe>
+<details>
+<summary>Show the Phase 2 Replication Study nanopub inline</summary>
+
+<iframe src="https://platform.sciencelive4all.org/np/?uri=https://w3id.org/sciencelive/np/RADLcvxDglyzEnEfAo9e6RfnXQ_YK3v_gJcnWLVBkIbP4" width="100%" height="1000" style="border:1px solid #ddd;border-radius:4px;"></iframe>
+
+</details>
 
 [View Phase 2 Study on Science Live →](https://platform.sciencelive4all.org/np/?uri=https://w3id.org/sciencelive/np/RADLcvxDglyzEnEfAo9e6RfnXQ_YK3v_gJcnWLVBkIbP4)
 
 ### Replication Outcome — Validated, High confidence
 
-<iframe src="https://platform.sciencelive4all.org/np/?uri=https://w3id.org/sciencelive/np/RABeytsVYYMfRz_Jb3O__naWSg8Z63WTnQsofidkdrVvk"
-        width="100%" height="700" style="border:1px solid #ddd;border-radius:4px;"></iframe>
+<details>
+<summary>Show the Phase 2 Replication Outcome nanopub inline</summary>
+
+<iframe src="https://platform.sciencelive4all.org/np/?uri=https://w3id.org/sciencelive/np/RABeytsVYYMfRz_Jb3O__naWSg8Z63WTnQsofidkdrVvk" width="100%" height="1000" style="border:1px solid #ddd;border-radius:4px;"></iframe>
+
+</details>
 
 [View Phase 2 Outcome on Science Live →](https://platform.sciencelive4all.org/np/?uri=https://w3id.org/sciencelive/np/RABeytsVYYMfRz_Jb3O__naWSg8Z63WTnQsofidkdrVvk)
 
@@ -66,8 +74,7 @@ downstream import into Wikidata / Scholia via dedicated pipelines —
 inclusion there is conditional on Wikidata's own notability criteria
 and on the import being run.
 
-<iframe src="https://platform.sciencelive4all.org/np/?uri=https://w3id.org/sciencelive/np/RAdvbQt3vXT0HpyNYdwwMBs8fVnmyv5KWFT0eXfVTDXg0"
-        width="100%" height="500" style="border:1px solid #ddd;border-radius:4px;"></iframe>
+<iframe src="https://platform.sciencelive4all.org/np/?uri=https://w3id.org/sciencelive/np/RAdvbQt3vXT0HpyNYdwwMBs8fVnmyv5KWFT0eXfVTDXg0" width="100%" height="600"></iframe>
 
 [View Phase 2 CiTO on Science Live →](https://platform.sciencelive4all.org/np/?uri=https://w3id.org/sciencelive/np/RAdvbQt3vXT0HpyNYdwwMBs8fVnmyv5KWFT0eXfVTDXg0)
 

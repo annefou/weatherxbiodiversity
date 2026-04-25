@@ -37,8 +37,12 @@ the published paper):
 > risk will rise, flag candidate climate refugia for conservation
 > prioritisation, or be extended to other thermally-sensitive insect taxa.
 
-<iframe src="https://platform.sciencelive4all.org/np/?uri=https://w3id.org/sciencelive/np/RAQ9l3vNjaSUeYZ8A0wgrzDPEbQQXBbd8jMszJ8pBzoiw"
-        width="100%" height="600" style="border:1px solid #ddd;border-radius:4px;"></iframe>
+<details>
+<summary>Show the Quote nanopub inline</summary>
+
+<iframe src="https://platform.sciencelive4all.org/np/?uri=https://w3id.org/sciencelive/np/RAQ9l3vNjaSUeYZ8A0wgrzDPEbQQXBbd8jMszJ8pBzoiw" width="100%" height="800" style="border:1px solid #ddd;border-radius:4px;"></iframe>
+
+</details>
 
 [View the Quote nanopub on Science Live →](https://platform.sciencelive4all.org/np/?uri=https://w3id.org/sciencelive/np/RAQ9l3vNjaSUeYZ8A0wgrzDPEbQQXBbd8jMszJ8pBzoiw)
 
@@ -55,8 +59,7 @@ This is the form the Claim is structured around. Note what's gone: "we
 show that…", the colonization mirror, the spatial-explicit framing.
 What's left is a claim about the world.
 
-<iframe src="https://platform.sciencelive4all.org/np/?uri=https://w3id.org/sciencelive/np/RAdv1pQt3itwTZtddbsLz7LLprlCHj72bEF-oXQVeYtdU"
-        width="100%" height="600" style="border:1px solid #ddd;border-radius:4px;"></iframe>
+<iframe src="https://platform.sciencelive4all.org/np/?uri=https://w3id.org/sciencelive/np/RAdv1pQt3itwTZtddbsLz7LLprlCHj72bEF-oXQVeYtdU" width="100%" height="700"></iframe>
 
 [View the AIDA nanopub on Science Live →](https://platform.sciencelive4all.org/np/?uri=https://w3id.org/sciencelive/np/RAdv1pQt3itwTZtddbsLz7LLprlCHj72bEF-oXQVeYtdU)
 
@@ -70,8 +73,12 @@ distribution. Cited authority: the Soroye paper.
 This is the node both Replication Studies (Phase 2 + Phase 3) target via
 the *Search for a FORRT claim* field on the Replication Study form.
 
-<iframe src="https://platform.sciencelive4all.org/np/?uri=https://w3id.org/sciencelive/np/RArj4912Wm6DO0Y-sR8KeaJsZUKrVcJHWArmINg-kaOhs"
-        width="100%" height="600" style="border:1px solid #ddd;border-radius:4px;"></iframe>
+<details>
+<summary>Show the FORRT Claim nanopub inline</summary>
+
+<iframe src="https://platform.sciencelive4all.org/np/?uri=https://w3id.org/sciencelive/np/RArj4912Wm6DO0Y-sR8KeaJsZUKrVcJHWArmINg-kaOhs" width="100%" height="900" style="border:1px solid #ddd;border-radius:4px;"></iframe>
+
+</details>
 
 [View the FORRT Claim nanopub on Science Live →](https://platform.sciencelive4all.org/np/?uri=https://w3id.org/sciencelive/np/RArj4912Wm6DO0Y-sR8KeaJsZUKrVcJHWArmINg-kaOhs)
 
