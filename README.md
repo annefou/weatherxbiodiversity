@@ -11,6 +11,12 @@ Replication of [Soroye, Newbold & Kerr (2020, *Science*)](https://doi.org/10.112
 
 ## Structure
 
+> [!IMPORTANT]
+> The Copernicus API requires users to manually accept the licence for a dataset before it can be retrieved.
+> If a `403` error with the text `requested licences not accepted` is encountered, please login to
+> the Copernicus CDS website and manually accept the required licence. Accepting a licence in this way
+> enables the download of all datasets using this licence without further manual action being required.
+
 ```
 weatherxbiodiversity/
 ├── notebooks/                  Upstream data-download notebooks (jupytext)
