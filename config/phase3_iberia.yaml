@@ -1,0 +1,31 @@
+# Phase 3: Soroye et al. (2020) on Iberian Bombus.
+# Parameters for each workflow under workflows/; read by the Snakefile.
+# Credentials: copy credentials/*.example.json to credentials/*.json and fill in.
+
+gbif:                                      # workflows/GBIF_Retrieval
+  # Existing GBIF download to fetch (public, no login): the citable snapshot
+  # DOI 10.15468/dl.3frmsq. Set to "" to request a new download with the
+  # filters below (needs credentials_file).
+  download_key: "0006204-260423192947929"
+  taxon_key: 1340278                       # genus Bombus
+  countries: [ES, PT]
+  has_coordinate: true
+  has_geospatial_issue: false
+  credentials_file: credentials/gbif_credentials.json
+  output_dir: data/gbif
+  poll_interval_sec: 30
+  poll_timeout_sec: 3600
+
+era5:                                      # workflows/ERA5_Retrieval
+  years: [1940, 2014]                      # ERA5 starts in 1940
+  # Monthly statistics per variable, from hourly data (UTC days):
+  #   mean, sum, daily_min_mean, daily_max_mean, daily_max_max
+  variables:
+    t2m: [mean, daily_min_mean, daily_max_mean]
+    tp: [sum]
+  # Region: "occurrences" = only the 1 x 1 degree store tiles within `buffer`
+  # degrees of the GBIF records; or a box [north, west, south, east].
+  area: occurrences
+  buffer: 1.0
+  credentials_file: credentials/cds_credentials.json
+  output_dir: data/era5_monthly

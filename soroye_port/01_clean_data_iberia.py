@@ -28,12 +28,12 @@ REF = ROOT / 'reference' / 'Bumblebee_repo_wbombusdat'
 # (DOI 10.15468/dl.3frmsq). Override with GBIF_DOWNLOAD_KEY to run a newer
 # snapshot (see data/gbif_bombus_iberia_metadata.json for the key of a 01b run).
 GBIF_KEY = os.environ.get('GBIF_DOWNLOAD_KEY', '0006204-260423192947929')
-GBIF_CSV = ROOT / 'data' / 'gbif_dl' / f'{GBIF_KEY}.csv'
+GBIF_CSV = Path(os.environ.get('GBIF_CSV', ROOT / 'data' / 'gbif_dl' / f'{GBIF_KEY}.csv'))
 KERR_SPP_CSV = REF / '0_data' / 'Kerr_et_al2015_spplist.csv'
 ERR_OBS_CSV = REF / '0_data' / 'bombus_err_obs.csv'
 
-OUT_DIR = ROOT / 'soroye_port' / 'outputs_iberia'
-OUT_DIR.mkdir(exist_ok=True)
+OUT_DIR = ROOT / 'soroye_port' / os.environ.get('OUT_SUBDIR', 'outputs_iberia')
+OUT_DIR.mkdir(parents=True, exist_ok=True)
 OUT_CLEAN = OUT_DIR / 'bombus_clean.csv'
 
 # ---------------------------------------------------------------------------

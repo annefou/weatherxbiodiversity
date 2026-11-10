@@ -1,0 +1,34 @@
+[workspace]
+name = "weatherxbiodiversity"
+description = "Soroye et al. (2020) replication for Iberian Bombus with GBIF, CRU TS and ERA5"
+channels = ["conda-forge"]
+platforms = ["linux-64", "osx-64", "osx-arm64", "win-64"]
+
+# Same packages as environment.yml (kept for Docker / mamba users).
+# pixi.lock pins the exact versions: `pixi install` reproduces them.
+[dependencies]
+python = "3.12.*"
+xarray = ">=2024.6"
+pandas = ">=2.0"
+numpy = "*"
+matplotlib = "*"
+scipy = "*"
+statsmodels = "*"
+pyarrow = "*"      # parquet I/O for dataGLMM intermediate
+pyproj = "*"
+netcdf4 = "*"
+cdsapi = "*"
+zarr = ">=3"       # notebooks/02b, 02c: ECMWF ARCO Zarr store
+fsspec = "*"
+aiohttp = "*"
+requests = "*"
+jupytext = "*"
+jupyterlab = "*"
+
+[pypi-dependencies]
+pygbif = "*"
+snakemake = "*"    # from PyPI, as in environment.yml
+
+[tasks]
+# Phase 3 (Iberia) pipeline end to end: `pixi run pipeline`
+pipeline = "snakemake --cores 1"

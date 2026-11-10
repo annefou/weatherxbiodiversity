@@ -67,6 +67,41 @@ See `soroye_port/phase2_forest.png` and `phase3_forest.png` for full coefficient
 
 ## Quick start
 
+### Workflow (Phase 3)
+
+The workflow is split into steps under `workflows/`, mirroring the
+[ARC](https://git.nfdi4plants.org/weil/WeatherXBiodiversity_Soroye2020):
+`GBIF_Retrieval`, `ERA5_Retrieval`, `GBIF_Preprocessing`, `Analysis`, each
+with its own `rules.smk`. Parameters live in `config/phase3_iberia.yaml`.
+
+```bash
+# 1. Environment, pinned by pixi.lock (Linux, macOS, Windows)
+pixi install
+
+# 2. Soroye's Figshare bundle (CRU TS + species tables), ~1.1 GB.
+#    Figshare refuses scripted downloads: download it in a browser from
+#    https://doi.org/10.6084/m9.figshare.9956471 and save it as
+#    reference/Bumblebee_repo.zip (or set FIGSHARE_ZIP=/path/to/zip).
+
+# 3. Credentials, only for what you use (files are gitignored):
+cp credentials/cds_credentials.example.json credentials/cds_credentials.json    # ERA5
+cp credentials/gbif_credentials.example.json credentials/gbif_credentials.json  # new GBIF downloads
+#    The default GBIF download (DOI 10.15468/dl.3frmsq) is public: no login needed.
+
+# 4. Run: retrieve GBIF by DOI, clean + grid, climate exposure, regression,
+#    and compare with the published coefficients
+pixi run snakemake --cores 1
+cat soroye_port/run/phase3/comparison_with_published.txt
+
+# Optional: ERA5 monthly statistics from ECMWF's ARCO Zarr store (CDS key)
+pixi run snakemake --cores 1 era5_retrieval
+```
+
+Re-runs are written to `soroye_port/run/phase3/` (gitignored); the committed
+published results in `soroye_port/outputs_iberia/` are never overwritten.
+
+### Manual steps (previous instructions)
+
 ```bash
 # Create environment
 mamba env create -f environment.yml

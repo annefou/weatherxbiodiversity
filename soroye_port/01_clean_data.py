@@ -24,8 +24,9 @@ BOMBUS_CSV = REF / '0_data' / 'bombus_ogdata.csv'
 KERR_SPP_CSV = REF / '0_data' / 'Kerr_et_al2015_spplist.csv'
 ERR_OBS_CSV = REF / '0_data' / 'bombus_err_obs.csv'
 
-OUT_DIR = ROOT / 'soroye_port' / 'outputs'
-OUT_DIR.mkdir(exist_ok=True)
+import os as _os
+OUT_DIR = ROOT / 'soroye_port' / _os.environ.get('OUT_SUBDIR', 'outputs')
+OUT_DIR.mkdir(parents=True, exist_ok=True)
 OUT_CLEAN = OUT_DIR / 'bombus_clean.csv'
 
 # ---------------------------------------------------------------------------

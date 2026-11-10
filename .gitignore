@@ -39,3 +39,10 @@ _build/
 
 # Local copy of paywalled reference paper
 science.aax8591.pdf
+
+# Credentials: copy credentials/*.example.json to credentials/*.json and fill in
+credentials/*.json
+!credentials/*.example.json
+
+# Workflow re-runs (compared against the committed published results)
+soroye_port/run/
