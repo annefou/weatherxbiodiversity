@@ -31,6 +31,9 @@ soroye_port/outputs_iberia/*.npz
 soroye_port/outputs_iberia/*.parquet
 soroye_port/outputs_iberia/bombus_clean.csv
 
+# Snakemake run state
+.snakemake/
+
 # MyST build output
 _build/
 

@@ -13,6 +13,9 @@ dependencies:
   - pyproj
   - netcdf4
   - cdsapi
+  - zarr>=3        # stream_era5_arco.py: ECMWF ARCO Zarr store
+  - fsspec
+  - aiohttp
   - requests
   - jupytext
   - jupyterlab
