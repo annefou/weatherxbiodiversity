@@ -78,9 +78,17 @@ python 02b_stream_era5_arco.py           # ERA5 from ECMWF's ARCO Zarr (CDS key,
 # or the same field via the CDS queue (66 one-year requests, ~27 h):
 # python 02_download_era5.py
 cd ..
-# and
-jupytext --to notebook notebooks/01_download_gbif.py
-jupyter execute --inplace notebooks/01_download_gbif.ipynb
+# and (GBIF — needs GBIF_USER/GBIF_PWD/GBIF_EMAIL set)
+cd notebooks
+# 01b mints the citable DOI and saves metadata, it does NOT download the data:
+python 01b_gbif_download_doi.py
+# fetch the zipped snapshot it just registered, and unpack where the pipeline expects it:
+mkdir -p ../data/gbif_dl
+curl -L -o ../data/gbif_dl/<download_key>.zip \
+  "https://api.gbif.org/v1/occurrence/download/request/<download_key>.zip"
+unzip -q ../data/gbif_dl/<download_key>.zip -d ../data/gbif_dl/
+# (the exact <download_key> and URL are printed by 01b)
+cd ..
 
 # Run the port end to end
 snakemake --cores 1
@@ -104,7 +112,7 @@ Scripts 02–05 take an `OUT_SUBDIR` env var (default `outputs`) to switch betwe
 
 ## Data sources
 
-- **Biodiversity**: [GBIF Occurrence Download — *Bombus* in Spain + Portugal, georeferenced, no geospatial issues, 36,560 records](https://doi.org/10.15468/dl.3frmsq) — citation: *GBIF.org (2026-04-25) GBIF Occurrence Download https://doi.org/10.15468/dl.3frmsq* — fetched via `notebooks/01b_gbif_download_doi.py`
+- **Biodiversity**: [GBIF Occurrence Download — *Bombus* in Spain + Portugal, georeferenced, no geospatial issues, 36,560 records](https://doi.org/10.15468/dl.3frmsq) — citation: *GBIF.org (2026-04-25) GBIF Occurrence Download https://doi.org/10.15468/dl.3frmsq* — DOI minted by `notebooks/01b_gbif_download_doi.py` (which saves the metadata only, not the data); the zip fetched from `https://api.gbif.org/v1/occurrence/download/request/0006204-260423192947929.zip` and unpacked in `data/gbif_dl/`
 - **Climate**: CRU TS 3.24.01 monthly (from Soroye's Figshare deposit) — used for both Phase 2 and Phase 3 to isolate region as the only swap variable
 - **Climate (future extension)**: [ERA5 via CDS](https://cds.climate.copernicus.eu/) — for a future sensitivity run; either downloaded via the CDS queue (`notebooks/02_download_era5.py`) or streamed from ECMWF's ARCO Zarr store of [`reanalysis-era5-single-levels`](https://cds.climate.copernicus.eu/datasets/reanalysis-era5-single-levels) (`notebooks/02b_stream_era5_arco.py`, `notebooks/02c_stream_era5_monthly_climate.py`)
 
