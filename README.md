@@ -67,38 +67,43 @@ See `soroye_port/phase2_forest.png` and `phase3_forest.png` for full coefficient
 
 ## Quick start
 
-### Workflow (Phase 3)
+### Workflow: Soroye 2020 replication on Iberia with ERA5
 
-The workflow is split into steps under `workflows/`, mirroring the
-[ARC](https://git.nfdi4plants.org/weil/WeatherXBiodiversity_Soroye2020):
-`GBIF_Retrieval`, `ERA5_Retrieval`, `GBIF_Preprocessing`, `Analysis`, each
-with its own `rules.smk`. Parameters live in `config/phase3_iberia.yaml`.
+Five steps under `workflows/`, each with its own Snakemake file (`rules.smk`),
+mirroring the [ARC](https://git.nfdi4plants.org/weil/WeatherXBiodiversity_Soroye2020).
+Parameters live in `config/phase3_iberia.yaml`.
+
+| Step | Snakemake target | Does |
+|---|---|---|
+| `GBIF_Retrieval` | `gbif_download` | Occurrences by GBIF download key / DOI (default 10.15468/dl.3frmsq), or a new request |
+| `ERA5_Retrieval` | `era5_download` | Monthly ERA5 statistics (t2m mean, daily min, daily max; tp sum), 1940–2014, streamed from ECMWF's ARCO Zarr store |
+| `GBIF_Preprocessing` | `gbif_preprocessing` | Clean + grid the occurrences (`soroye_port/01_clean_data_iberia.py`, `02`, `03`) |
+| `ERA5_Preprocessing` | `era5_preprocessing` | Monthly `tmp`, `tmn`, `tmx`, `pre` (°C, mm) with CRU TS definitions |
+| `Analysis` | `analysis` | Exposure indices (`04`, ERA5 climate, baseline 1940–1974), model table (`05a`), regression (`05b`) |
 
 ```bash
 # 1. Environment, pinned by pixi.lock (Linux, macOS, Windows)
 pixi install
 
-# 2. Soroye's Figshare bundle (CRU TS + species tables), ~1.1 GB.
+# 2. Soroye's Figshare bundle, ~1.1 GB (only its species tables are used).
 #    Figshare refuses scripted downloads: download it in a browser from
 #    https://doi.org/10.6084/m9.figshare.9956471 and save it as
 #    reference/Bumblebee_repo.zip (or set FIGSHARE_ZIP=/path/to/zip).
 
-# 3. Credentials, only for what you use (files are gitignored):
-cp credentials/cds_credentials.example.json credentials/cds_credentials.json    # ERA5
-cp credentials/gbif_credentials.example.json credentials/gbif_credentials.json  # new GBIF downloads
+# 3. Credentials (files are gitignored):
+cp credentials/cds_credentials.example.json credentials/cds_credentials.json    # ERA5: your CDS API key
+cp credentials/gbif_credentials.example.json credentials/gbif_credentials.json  # only for a new GBIF download
 #    The default GBIF download (DOI 10.15468/dl.3frmsq) is public: no login needed.
 
-# 4. Run: retrieve GBIF by DOI, clean + grid, climate exposure, regression,
-#    and compare with the published coefficients
+# 4. Run all steps, or one step at a time
 pixi run snakemake --cores 1
-cat soroye_port/run/phase3/comparison_with_published.txt
-
-# Optional: ERA5 monthly statistics from ECMWF's ARCO Zarr store (CDS key)
-pixi run snakemake --cores 1 era5_retrieval
+pixi run snakemake --cores 1 gbif_download   # gbif_download, era5_download, gbif_preprocessing,
+                                             # era5_preprocessing, analysis
 ```
 
-Re-runs are written to `soroye_port/run/phase3/` (gitignored); the committed
-published results in `soroye_port/outputs_iberia/` are never overwritten.
+Results: `soroye_port/run/phase3_era5/posterior_vb_summary.csv` (gitignored).
+The ERA5 download is paced (the ARCO store rate-limits per key) and takes the
+longest; the other steps take minutes.
 
 ### Manual steps (previous instructions)
 
