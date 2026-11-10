@@ -42,13 +42,23 @@ CLIM_DIR = REF / '0_ClimateData'
 import os as _os
 OUT_DIR = ROOT / 'soroye_port' / _os.environ.get('OUT_SUBDIR', 'outputs')
 
-# Climate source: 'cru' (default, CRU TS from the Figshare bundle, as published)
-# or 'era5' (monthly tmp/tmn/tmx/pre from workflows/ERA5_Preprocessing, read
-# from ERA5_CLIMATE_DIR).
+# Climate source:
+#   'cru' (default)  CRU TS 3.24.01 from the Figshare bundle, as published.
+#   anything else    a label (e.g. era5, climatedt, cmip6) for monthly climate
+#                    in CLIMATE_DIR that follows the common climate input
+#                    format (workflows/CLIMATE_INPUT.md): one file per variable,
+#                    <label>_<var>_monthly_<start>_<end>.nc, tmp/tmn/tmx in
+#                    degC and pre in mm, dims (time, lat, lon).
+# Periods: BASELINE_YEARS / RECENT_YEARS as "START-END" (inclusive); defaults
+# are Soroye's 1901-1974 / 2000-2014.
 CLIMATE_SOURCE = _os.environ.get('CLIMATE_SOURCE', 'cru')
-if CLIMATE_SOURCE not in ('cru', 'era5'):
-    raise SystemExit(f"CLIMATE_SOURCE must be 'cru' or 'era5', got {CLIMATE_SOURCE!r}")
-ERA5_CLIMATE_DIR = Path(_os.environ.get('ERA5_CLIMATE_DIR', ROOT / 'data' / 'era5_climate'))
+CLIMATE_DIR = Path(_os.environ.get('CLIMATE_DIR', ROOT / 'data' / f'{CLIMATE_SOURCE}_climate'))
+CLIMATE_UNITS = {'tmp': 'degC', 'tmn': 'degC', 'tmx': 'degC', 'pre': 'mm'}
+
+
+def _years(env: str, default: tuple[int, int]) -> list[int]:
+    start, end = (int(y) for y in _os.environ.get(env, f'{default[0]}-{default[1]}').split('-'))
+    return list(range(start, end + 1))
 
 # --- CEA grid config (matches scripts 2/3) ---
 RES_M = 100_000
@@ -60,12 +70,10 @@ cea_to_ll = Transformer.from_crs(
 )
 
 # Period year sets (from R — baseline 1901–1974 and recent 2000–2014)
-BASELINE_YEARS = list(range(1901, 1975))
-RECENT_YEARS = list(range(2000, 2015))
-if CLIMATE_SOURCE == 'era5':
-    # ERA5 starts in 1940: the climate baseline is 1940–1974. Occurrence
-    # periods (script 01) are unchanged.
-    BASELINE_YEARS = list(range(1940, 1975))
+BASELINE_YEARS = _years('BASELINE_YEARS', (1901, 1974))
+RECENT_YEARS = _years('RECENT_YEARS', (2000, 2014))
+# A source that starts later (e.g. ERA5 in 1940) needs a shorter climate
+# baseline, set via BASELINE_YEARS. Occurrence periods (script 01) are unchanged.
 
 # ---------------------------------------------------------------------------
 # Helpers
@@ -76,12 +84,16 @@ def load_cru_annual(var: str, agg: str) -> xr.DataArray:
     agg: 'mean' | 'sum' | 'min' | 'max'
     Returns DataArray (year, lat, lon) in degC (or mm for precip).
     """
-    if CLIMATE_SOURCE == 'era5':
-        files = sorted(ERA5_CLIMATE_DIR.glob(f'era5_{var}_monthly_*.nc'))
+    if CLIMATE_SOURCE != 'cru':
+        files = sorted(CLIMATE_DIR.glob(f'{CLIMATE_SOURCE}_{var}_monthly_*.nc'))
         if len(files) != 1:
-            raise SystemExit(f'Expected one era5_{var}_monthly_*.nc in {ERA5_CLIMATE_DIR}, found {len(files)}')
+            raise SystemExit(f'Expected one {CLIMATE_SOURCE}_{var}_monthly_*.nc in {CLIMATE_DIR}, '
+                             f'found {len(files)}')
         print(f'  {var}: {files[0].name}')
         v = xr.open_dataarray(files[0])
+        if v.attrs.get('units') != CLIMATE_UNITS[var] or set(v.dims) != {'time', 'lat', 'lon'}:
+            raise SystemExit(f'{files[0].name}: expected units {CLIMATE_UNITS[var]!r} and dims '
+                             f'(time, lat, lon), got {v.attrs.get("units")!r} and {v.dims}')
         annual = getattr(v.resample(time='YE'), agg)(skipna=False)
         return annual.assign_coords(time=annual['time.year']).rename({'time': 'year'})
     files = sorted(CLIM_DIR.glob(f'*{var}.dat.nc'))

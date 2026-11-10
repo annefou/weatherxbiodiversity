@@ -102,6 +102,12 @@ pixi run snakemake --cores 1 gbif_download   # gbif_download, era5_download, gbi
 ```
 
 Results: `soroye_port/run/phase3_era5/posterior_vb_summary.csv` (gitignored).
+
+The climate source is swappable: `Analysis` reads monthly climate in a common
+format ([`workflows/CLIMATE_INPUT.md`](workflows/CLIMATE_INPUT.md)), selected by
+the `climate` section of the config. Another source (e.g. Destination Earth
+Climate DT or CMIP6 for future scenarios) only needs its own retrieval and
+preprocessing steps producing the same files.
 The ERA5 download is paced (the ARCO store rate-limits per key) and takes the
 longest; the other steps take minutes.
 

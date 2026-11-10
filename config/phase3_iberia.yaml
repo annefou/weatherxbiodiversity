@@ -37,3 +37,12 @@ era5:                                      # workflows/ERA5_Retrieval
   buffer: 1.0
   credentials_file: credentials/cds_credentials.json
   output_dir: data/era5
+
+climate:                                   # input of workflows/Analysis
+  # Monthly climate in the common climate input format (workflows/CLIMATE_INPUT.md).
+  # To use another source (e.g. Destination Earth Climate DT, CMIP6), produce the
+  # same files with that source's retrieval + preprocessing and change these lines.
+  source: era5                             # label: files are <source>_<var>_monthly_*.nc
+  dir: data/era5_climate                   # written by workflows/ERA5_Preprocessing
+  baseline_years: [1940, 1974]             # Soroye: 1901-1974; ERA5 starts in 1940
+  recent_years: [2000, 2014]
