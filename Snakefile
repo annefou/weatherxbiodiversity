@@ -32,11 +32,13 @@ rule download_gbif:
         """
 
 
-rule download_era5_daily:
+# ERA5 daily max T via the CDS queue (one request per year, ~27 h),
+# then monthly max of daily max.
+rule download_era5:
     output:
-        directory(f"{DATA}/era5_daily_max"),
+        f"{DATA}/era5_iberia_monthly_tmax.nc",
     shell:
-        "python download_era5_daily.py"
+        f"cd {NOTEBOOKS} && python 02_download_era5.py"
 
 
 # --------- Phase 3: apply the Python port to Iberia data ---------
