@@ -24,7 +24,8 @@ weatherxbiodiversity/
 │   └── 02_download_era5.py     ERA5 monthly max temperature
 ├── download_era5_daily.py      ERA5 daily-max batch downloader (CDS queue)
 ├── stream_era5_arco.py         ERA5 monthly max T streamed from ECMWF ARCO Zarr
-├── stream_era5_cru_like.py     ERA5 monthly tmp/tmn/tmx/pre with CRU TS definitions (ARCO Zarr)
+├── stream_era5_monthly_climate.py
+│                               ERA5 monthly tmp/tmn/tmx/pre with CRU TS definitions (ARCO Zarr)
 ├── data/                       Processed data
 ├── reference/Bumblebee_repo_wbombusdat/
 │                               Soroye et al.'s Figshare dataset (R scripts + CRU TS)

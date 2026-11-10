@@ -1,5 +1,5 @@
 """
-Build CRU-TS-like monthly climate (tmp, tmn, tmx, pre) from ERA5 hourly
+Build monthly climate (tmp, tmn, tmx, pre) from ERA5 hourly
 data streamed from ECMWF's ARCO Zarr store, as climate input for a planned
 Phase 3 sensitivity run that swaps CRU TS for ERA5 in
 soroye_port/04_climate_tei_pei.py.
@@ -20,8 +20,8 @@ over the bounding box of those tiles; points outside fetched tiles are NaN.
 Authentication: CDS API key (see stream_era5_arco.py).
 
 Usage:
-    python stream_era5_cru_like.py                    # 1940-2014
-    python stream_era5_cru_like.py --start 2000 --end 2000 --outdir /tmp/x
+    python stream_era5_monthly_climate.py                    # 1940-2014
+    python stream_era5_monthly_climate.py --start 2000 --end 2000 --outdir /tmp/x
 """
 
 import argparse
@@ -97,7 +97,7 @@ def main() -> None:
     p.add_argument("--start", type=int, default=1940)
     p.add_argument("--end", type=int, default=2014)
     p.add_argument("--gbif", default=GBIF_CSV)
-    p.add_argument("--outdir", default="data/era5_cru_like")
+    p.add_argument("--outdir", default="data/era5_monthly")
     p.add_argument("--workers", type=int, default=32)
     args = p.parse_args()
 
@@ -222,7 +222,7 @@ def main() -> None:
         vals[:, ~filled] = np.nan
         da = xr.DataArray(vals, dims=("time", "lat", "lon"), coords=coords,
                           name=var, attrs={"units": units, "long_name": long_name})
-        da.attrs["source"] = "ERA5 hourly (reanalysis-era5-single-levels), ECMWF ARCO Zarr, CRU-TS-like aggregation"
+        da.attrs["source"] = "ERA5 hourly (reanalysis-era5-single-levels), ECMWF ARCO Zarr, aggregated with CRU TS 3.24.01 definitions"
         f = out / f"era5_{var}_monthly_{args.start}_{args.end}.nc"
         da.to_netcdf(f)
         print(f"Saved {f} ({f.stat().st_size / 1e6:.1f} MB)")
