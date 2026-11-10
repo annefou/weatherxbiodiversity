@@ -16,6 +16,7 @@ Differences from the Phase-2 script:
 """
 from __future__ import annotations
 
+import os
 from pathlib import Path
 
 import numpy as np
@@ -23,7 +24,11 @@ import pandas as pd
 
 ROOT = Path(__file__).resolve().parent.parent
 REF = ROOT / 'reference' / 'Bumblebee_repo_wbombusdat'
-GBIF_CSV = ROOT / 'data' / 'gbif_dl' / '0006204-260423192947929.csv'
+# GBIF Occurrence Download key; default = the citable snapshot of the study
+# (DOI 10.15468/dl.3frmsq). Override with GBIF_DOWNLOAD_KEY to run a newer
+# snapshot (see data/gbif_bombus_iberia_metadata.json for the key of a 01b run).
+GBIF_KEY = os.environ.get('GBIF_DOWNLOAD_KEY', '0006204-260423192947929')
+GBIF_CSV = ROOT / 'data' / 'gbif_dl' / f'{GBIF_KEY}.csv'
 KERR_SPP_CSV = REF / '0_data' / 'Kerr_et_al2015_spplist.csv'
 ERR_OBS_CSV = REF / '0_data' / 'bombus_err_obs.csv'
 

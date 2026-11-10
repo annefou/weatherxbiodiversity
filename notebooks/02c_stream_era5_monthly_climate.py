@@ -113,7 +113,8 @@ STORE_URL = (
 )
 START = int(os.environ.get("ERA5_START", 1940))
 END = int(os.environ.get("ERA5_END", 2014))
-GBIF_CSV = DATA / "gbif_dl" / "0006204-260423192947929.csv"
+GBIF_KEY = os.environ.get("GBIF_DOWNLOAD_KEY", "0006204-260423192947929")
+GBIF_CSV = DATA / "gbif_dl" / f"{GBIF_KEY}.csv"
 OUTDIR = Path(os.environ.get("ERA5_OUTDIR", DATA / "era5_monthly"))
 WORKERS = 1  # concurrent tile reads; the ARCO store 403s above ~10 in flight
 
