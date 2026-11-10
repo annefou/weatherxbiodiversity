@@ -55,16 +55,41 @@ dimensions.
 
 - **ERA5** (`workflows/ERA5_Retrieval`, `workflows/ERA5_Preprocessing`):
   hourly ARCO store → monthly statistics (K, m) → this format.
-- **Destination Earth Climate DT**: use generation 2 (1990–2049) via Polytope
-  on the MareNostrum5 endpoint, with server-side polygon extraction around the
-  occurrences; precipitation is `avg_tprate` (kg m⁻² s⁻¹; × 3600 per hour → mm),
-  `tp` is refused. Climate DT is on a native (spherical) HEALPix grid: map
-  cells to geodetic WGS84 coordinates with `healpix-geo` / `healpix-resample`
-  using `ellipsoid="WGS84"` (authalic latitude), as in the GRID4EARTH Climate
-  DT recipe — not with `healpy`, which treats latitudes as spherical (an error
-  of up to ~0.13°, ~14 km, at Iberian latitudes). Generation 2 starts in 1990,
-  so it cannot supply Soroye's historical baseline: use it for future periods,
-  with the species limits and model fit from the historical source.
+- **Destination Earth Climate DT** (lessons from the other hackathon projects
+  that use it; working code in `konya-wetlands-water-surface`,
+  `anatolia-jerboa-climate-sdm`, `donana-hydroperiod-evidence`,
+  `extreme-precipitation-climatedt-replication` and GRID4EARTH
+  `healpix-connector`):
+  - Generation 2 via Polytope (`class=d1, dataset=climate-dt, generation=2`):
+    historical `activity=baseline, experiment=hist` 1990–2014, scenario
+    `activity=projections, experiment=SSP3-7.0` 2015–2049; one realization.
+    The endpoint depends on the model: IFS-NEMO on
+    `polytope.mn5.apps.dte.destination-earth.eu`, IFS-FESOM on
+    `polytope.lumi.apps.dte.destination-earth.eu`.
+  - Monthly stream `clmn` has `avg_2t` (228004) and `avg_tprate` (235055) —
+    enough for `tmp` and `pre` (rate × 86400 × days → mm) — but **no monthly
+    min / max temperature** (`mx2t24`/`mn2t24` silently resolve to other
+    fields). For `tmn` / `tmx` either aggregate hourly `clte` `2t` to daily
+    min / max (much larger volume), or use a delta method on the historical
+    source (add the Climate DT change in mean temperature to its tmn / tmx, as
+    in `anatolia-jerboa-climate-sdm`). Request parameters by numeric id and
+    check the returned paramId.
+  - `tp` / `228` is refused; precipitation is `avg_tprate` (kg m⁻² s⁻¹). In
+    hourly `clte` feature requests, list the 24 hours explicitly: a
+    `/to/../by/..` range silently returns only the first hour.
+  - Cut the area server-side (`polygon` or `boundingbox` feature; MARS cannot
+    crop HEALPix with `area`). Keep transfers well below ~500 MB and at most 5
+    concurrent requests; retry with back-off.
+  - Climate DT is on a native **spherical** HEALPix grid. Never match its cell
+    ids to WGS84 cells; resample from coordinates to geodetic WGS84 with
+    `healpix-geo` / `healpix-resample` (`ellipsoid="WGS84"`, authalic
+    latitude), e.g. healpix-connector's `BilinearConservative` — not `healpy`
+    (spherical latitudes; up to ~0.13°, ~14 km, off at Iberian latitudes).
+  - Generation 2 starts in 1990, so it cannot supply Soroye's historical
+    baseline: use it for future periods, with the species limits and model
+    fit from the historical source.
+  - Raw Climate DT data must not be redistributed; DestinE attribution is
+    required on derived outputs.
 - **CMIP6**: the monthly `Amon` table already has `tas`, `tasmin`, `tasmax`,
   `pr` (K, K, K, kg m⁻² s⁻¹), matching these definitions after unit conversion
   and regridding to a regular lat/lon grid.
