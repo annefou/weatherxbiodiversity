@@ -21,11 +21,11 @@ Replication of [Soroye, Newbold & Kerr (2020, *Science*)](https://doi.org/10.112
 weatherxbiodiversity/
 ├── notebooks/                  Upstream data-download notebooks (jupytext)
 │   ├── 01_download_gbif.py     GBIF Bombus records for Iberia (~36k)
-│   └── 02_download_era5.py     ERA5 monthly max temperature
-├── download_era5_daily.py      ERA5 daily-max batch downloader (CDS queue)
-├── stream_era5_arco.py         ERA5 monthly max T streamed from ECMWF ARCO Zarr
-├── stream_era5_monthly_climate.py
+│   ├── 02_download_era5.py     ERA5 monthly max temperature (CDS queue)
+│   ├── 02b_stream_era5_arco.py ERA5 monthly max T streamed from ECMWF ARCO Zarr (~1 min)
+│   └── 02c_stream_era5_monthly_climate.py
 │                               ERA5 monthly tmp/tmn/tmx/pre with CRU TS definitions (ARCO Zarr)
+├── download_era5_daily.py      ERA5 daily-max batch downloader (CDS queue)
 ├── data/                       Processed data
 ├── reference/Bumblebee_repo_wbombusdat/
 │                               Soroye et al.'s Figshare dataset (R scripts + CRU TS)
@@ -74,7 +74,7 @@ mamba activate weatherxbio
 # Download data (one-off, slow)
 python download_era5_daily.py            # 66 years × 1.3 MB, ~27 h via CDS queue
 # or, much faster, stream from ECMWF's ARCO Zarr (same CDS key, ~1 min):
-python stream_era5_arco.py               # -> data/era5_iberia_monthly_tmax_arco.nc
+python notebooks/02b_stream_era5_arco.py # -> data/era5_iberia_monthly_tmax_arco.nc
 # and
 jupytext --to notebook notebooks/01_download_gbif.py
 jupyter execute --inplace notebooks/01_download_gbif.ipynb
@@ -103,7 +103,7 @@ Scripts 02–05 take an `OUT_SUBDIR` env var (default `outputs`) to switch betwe
 
 - **Biodiversity**: [GBIF Occurrence Download — *Bombus* in Spain + Portugal, georeferenced, no geospatial issues, 36,560 records](https://doi.org/10.15468/dl.3frmsq) — citation: *GBIF.org (2026-04-25) GBIF Occurrence Download https://doi.org/10.15468/dl.3frmsq* — fetched via `notebooks/01b_gbif_download_doi.py`
 - **Climate**: CRU TS 3.24.01 monthly (from Soroye's Figshare deposit) — used for both Phase 2 and Phase 3 to isolate region as the only swap variable
-- **Climate (future extension)**: [ERA5 via CDS](https://cds.climate.copernicus.eu/) — for a future sensitivity run; either downloaded via the CDS queue (`download_era5_daily.py`) or streamed from ECMWF's ARCO Zarr store of [`reanalysis-era5-single-levels`](https://cds.climate.copernicus.eu/datasets/reanalysis-era5-single-levels) (`stream_era5_arco.py`)
+- **Climate (future extension)**: [ERA5 via CDS](https://cds.climate.copernicus.eu/) — for a future sensitivity run; either downloaded via the CDS queue (`download_era5_daily.py`) or streamed from ECMWF's ARCO Zarr store of [`reanalysis-era5-single-levels`](https://cds.climate.copernicus.eu/datasets/reanalysis-era5-single-levels) (`notebooks/02b_stream_era5_arco.py`, `notebooks/02c_stream_era5_monthly_climate.py`)
 
 ## How to cite
 

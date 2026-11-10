@@ -13,7 +13,7 @@ dependencies:
   - pyproj
   - netcdf4
   - cdsapi
-  - zarr>=3        # stream_era5_arco.py: ECMWF ARCO Zarr store
+  - zarr>=3        # notebooks/02b, 02c: ECMWF ARCO Zarr store
   - fsspec
   - aiohttp
   - requests
