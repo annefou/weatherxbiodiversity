@@ -98,6 +98,7 @@ python 01_clean_data_iberia.py
 OUT_SUBDIR=outputs_iberia python 02_presence_absence.py
 OUT_SUBDIR=outputs_iberia python 03_sampling_continent.py
 OUT_SUBDIR=outputs_iberia python 04_climate_tei_pei.py
+OUT_SUBDIR=outputs_iberia python 05a_build_dataGLMM.py
 OUT_SUBDIR=outputs_iberia python 05b_regression_statsmodels.py
 python plot_forest.py
 ```
