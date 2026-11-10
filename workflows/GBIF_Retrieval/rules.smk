@@ -1,5 +1,6 @@
-# GBIF_Retrieval: occurrences from GBIF, by download key (DOI) or new request.
-# Parameters: the `gbif` section of the config.
+# GBIF_Retrieval: download the occurrences from GBIF, by download key (DOI)
+# or as a new request. Parameters: the `gbif` section of the config.
+# Run on its own: snakemake --cores 1 gbif_download
 
 GBIF = config["gbif"]
 GBIF_OCC = f"{GBIF['output_dir']}/occurrences.csv"
@@ -20,7 +21,13 @@ def gbif_args():
     ])
 
 
-rule gbif_retrieval:
+rule gbif_download:
+    input:
+        GBIF_OCC,
+        GBIF_META,
+
+
+rule gbif_retrieve:
     output:
         GBIF_OCC,
         GBIF_META,

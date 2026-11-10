@@ -1,15 +1,35 @@
-# GBIF_Preprocessing: clean the occurrences and grid them (100 km equal-area):
-# presence/absence per species and period, sampling effort per cell.
-# Uses the Soroye port scripts 01-03 (soroye_port/). Output: soroye_port/run/phase3/.
+# GBIF_Preprocessing: clean the occurrences (Kerr et al. 2015 species list,
+# synonyms, erroneous observations, periods) and grid them on the 100 km
+# equal-area grid: presence/absence per species and period, sampling effort.
+# Soroye port scripts 01-03. Species tables come from Soroye's Figshare bundle.
+# Run on its own: snakemake --cores 1 gbif_preprocessing
 
-RUN = "soroye_port/run/phase3"          # relative to soroye_port/: run/phase3
-RUN_SUB = "run/phase3"
+FIGSHARE_ZIP = os.environ.get("FIGSHARE_ZIP", "reference/Bumblebee_repo.zip")
+FIGSHARE_TABLES = "reference/.figshare_tables_extracted"
+RUN_SUB = config["run_subdir"]          # under soroye_port/
+RUN = f"soroye_port/{RUN_SUB}"
+
+
+rule gbif_preprocessing:
+    input:
+        f"{RUN}/presence_absence.npz",
+        f"{RUN}/sampling_continent.npz",
+
+
+# Only the species tables (0_data) are needed: Kerr species list, erroneous observations.
+rule figshare_tables:
+    input:
+        FIGSHARE_ZIP,
+    output:
+        touch(FIGSHARE_TABLES),
+    shell:
+        "unzip -o -q {input} 'Bumblebee_repo_wbombusdat/0_data/*' -d reference"
 
 
 rule gbif_clean:
     input:
         GBIF_OCC,
-        FIGSHARE_OK,                     # Kerr species list, erroneous-observations table
+        FIGSHARE_TABLES,
     output:
         f"{RUN}/bombus_clean.csv",
     shell:

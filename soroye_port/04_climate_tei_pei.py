@@ -42,6 +42,14 @@ CLIM_DIR = REF / '0_ClimateData'
 import os as _os
 OUT_DIR = ROOT / 'soroye_port' / _os.environ.get('OUT_SUBDIR', 'outputs')
 
+# Climate source: 'cru' (default, CRU TS from the Figshare bundle, as published)
+# or 'era5' (monthly tmp/tmn/tmx/pre from workflows/ERA5_Preprocessing, read
+# from ERA5_CLIMATE_DIR).
+CLIMATE_SOURCE = _os.environ.get('CLIMATE_SOURCE', 'cru')
+if CLIMATE_SOURCE not in ('cru', 'era5'):
+    raise SystemExit(f"CLIMATE_SOURCE must be 'cru' or 'era5', got {CLIMATE_SOURCE!r}")
+ERA5_CLIMATE_DIR = Path(_os.environ.get('ERA5_CLIMATE_DIR', ROOT / 'data' / 'era5_climate'))
+
 # --- CEA grid config (matches scripts 2/3) ---
 RES_M = 100_000
 X_MIN, X_MAX = -20_037_507, 20_062_493
@@ -54,6 +62,10 @@ cea_to_ll = Transformer.from_crs(
 # Period year sets (from R — baseline 1901–1974 and recent 2000–2014)
 BASELINE_YEARS = list(range(1901, 1975))
 RECENT_YEARS = list(range(2000, 2015))
+if CLIMATE_SOURCE == 'era5':
+    # ERA5 starts in 1940: the climate baseline is 1940–1974. Occurrence
+    # periods (script 01) are unchanged.
+    BASELINE_YEARS = list(range(1940, 1975))
 
 # ---------------------------------------------------------------------------
 # Helpers
@@ -64,6 +76,14 @@ def load_cru_annual(var: str, agg: str) -> xr.DataArray:
     agg: 'mean' | 'sum' | 'min' | 'max'
     Returns DataArray (year, lat, lon) in degC (or mm for precip).
     """
+    if CLIMATE_SOURCE == 'era5':
+        files = sorted(ERA5_CLIMATE_DIR.glob(f'era5_{var}_monthly_*.nc'))
+        if len(files) != 1:
+            raise SystemExit(f'Expected one era5_{var}_monthly_*.nc in {ERA5_CLIMATE_DIR}, found {len(files)}')
+        print(f'  {var}: {files[0].name}')
+        v = xr.open_dataarray(files[0])
+        annual = getattr(v.resample(time='YE'), agg)(skipna=False)
+        return annual.assign_coords(time=annual['time.year']).rename({'time': 'year'})
     files = sorted(CLIM_DIR.glob(f'*{var}.dat.nc'))
     print(f'  {var}: {len(files)} decade files')
     pieces = []

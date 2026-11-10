@@ -1,6 +1,9 @@
-# Phase 3: Soroye et al. (2020) on Iberian Bombus.
+# Soroye et al. (2020) replication on Iberian Bombus, with ERA5 climate.
 # Parameters for each workflow under workflows/; read by the Snakefile.
 # Credentials: copy credentials/*.example.json to credentials/*.json and fill in.
+
+# Results of this run, under soroye_port/ (gitignored)
+run_subdir: run/phase3_era5
 
 gbif:                                      # workflows/GBIF_Retrieval
   # Existing GBIF download to fetch (public, no login): the citable snapshot

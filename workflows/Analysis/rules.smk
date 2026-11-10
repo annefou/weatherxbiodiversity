@@ -1,19 +1,23 @@
-# Analysis: combine monthly climate with the gridded occurrences (per-species
-# thermal / precipitation exposure, TEI / PEI), build the model table, fit the
-# mixed-effects regression, and compare with the published coefficients.
-# Uses the Soroye port scripts 04, 05a, 05b. Climate: CRU TS (Figshare bundle).
+# Analysis: combine the monthly ERA5 climate with the gridded occurrences
+# (per-species thermal / precipitation exposure, TEI / PEI), build the model
+# table and fit the mixed-effects regression. Soroye port scripts 04, 05a, 05b.
+# Run on its own: snakemake --cores 1 analysis
 
-PUBLISHED = "soroye_port/outputs_iberia/posterior_vb_summary.csv"   # committed
+
+rule analysis:
+    input:
+        f"{RUN}/posterior_vb_summary.csv",
 
 
 rule climate_exposure:
     input:
         f"{RUN}/presence_absence.npz",
-        FIGSHARE_OK,                     # CRU TS 3.24.01 monthly tmp/tmn/tmx/pre
+        ERA5_CLIMATE,
     output:
         f"{RUN}/climate_tei_pei.npz",
     shell:
-        f"cd soroye_port && OUT_SUBDIR={RUN_SUB} python 04_climate_tei_pei.py"
+        f"cd soroye_port && OUT_SUBDIR={RUN_SUB} CLIMATE_SOURCE=era5 "
+        f"ERA5_CLIMATE_DIR=../{ERA5_CLIMATE_DIR} python 04_climate_tei_pei.py"
 
 
 rule model_table:
@@ -34,14 +38,3 @@ rule regression:
         f"{RUN}/posterior_vb_summary.csv",
     shell:
         f"cd soroye_port && OUT_SUBDIR={RUN_SUB} python 05b_regression_statsmodels.py"
-
-
-rule compare_with_published:
-    input:
-        rerun=f"{RUN}/posterior_vb_summary.csv",
-        published=PUBLISHED,
-    output:
-        f"{RUN}/comparison_with_published.txt",
-    shell:
-        "python workflows/Analysis/compare_with_published.py {input.rerun} {input.published} "
-        "--report {output}"

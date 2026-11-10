@@ -1,5 +1,6 @@
-# ERA5_Retrieval: monthly statistics from hourly ERA5, streamed from ECMWF's
-# ARCO Zarr store. Parameters: the `era5` section of the config.
+# ERA5_Retrieval: download monthly statistics of hourly ERA5, streamed from
+# ECMWF's ARCO Zarr store. Parameters: the `era5` section of the config.
+# Run on its own: snakemake --cores 1 era5_download
 
 import json
 
@@ -18,7 +19,12 @@ def era5_region():
     return f"--area {n} {w} {s} {e}"
 
 
-rule era5_retrieval:
+rule era5_download:
+    input:
+        ERA5_FILES,
+
+
+rule era5_retrieve:
     input:
         GBIF_OCC if ERA5["area"] == "occurrences" else [],
     output:
