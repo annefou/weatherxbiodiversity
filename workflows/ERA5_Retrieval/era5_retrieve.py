@@ -4,6 +4,13 @@ single-level data, streamed from ECMWF's ARCO Zarr store (geo-chunked,
 time-series optimised). Only the requested statistics are saved; the hourly
 data are never written to disk.
 
+Source: always the hourly store STORE_URL (reanalysis-era5-single-levels,
+surface variables). ARCO offers no separate daily or monthly product, so both
+are computed here from the hourly values; --frequency only changes that
+aggregation. They reproduce the CDS products derived-era5-single-levels-daily-
+statistics (daily min / max / mean / sum, UTC, from 1-hourly data) and
+reanalysis-era5-single-levels-monthly-means (monthly averaged reanalysis).
+
 Any variable of the store, any years from 1940, any region:
   --area N W S E                 a box, or
   --occurrences CSV [--buffer]   only the store tiles (1 x 1 degree) within

@@ -21,6 +21,8 @@ gbif:                                      # workflows/GBIF_Retrieval
 
 era5:                                      # workflows/ERA5_Retrieval
   years: [1940, 2014]                      # ERA5 starts in 1940
+  # Source: ECMWF's hourly ARCO store (reanalysis-era5-single-levels); daily and
+  # monthly statistics are both computed from the hourly values.
   frequency: monthly                       # monthly (one file per variable/statistic)
                                            # or daily (one file per year)
   # Statistics per variable, from hourly data (UTC days):
