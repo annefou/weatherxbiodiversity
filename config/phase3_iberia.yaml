@@ -21,8 +21,11 @@ gbif:                                      # workflows/GBIF_Retrieval
 
 era5:                                      # workflows/ERA5_Retrieval
   years: [1940, 2014]                      # ERA5 starts in 1940
-  # Monthly statistics per variable, from hourly data (UTC days):
-  #   mean, sum, daily_min_mean, daily_max_mean, daily_max_max
+  frequency: monthly                       # monthly (one file per variable/statistic)
+                                           # or daily (one file per year)
+  # Statistics per variable, from hourly data (UTC days):
+  #   monthly: mean, sum, daily_min_mean, daily_max_mean, daily_max_max
+  #   daily:   mean, sum, min, max
   variables:
     t2m: [mean, daily_min_mean, daily_max_mean]
     tp: [sum]
@@ -31,4 +34,4 @@ era5:                                      # workflows/ERA5_Retrieval
   area: occurrences
   buffer: 1.0
   credentials_file: credentials/cds_credentials.json
-  output_dir: data/era5_monthly
+  output_dir: data/era5

@@ -1,6 +1,8 @@
 """
-Generic ERA5 retrieval: monthly statistics from hourly ERA5 single-level data,
-streamed from ECMWF's ARCO Zarr store (geo-chunked, time-series optimised).
+Generic ERA5 retrieval: daily or monthly statistics from hourly ERA5
+single-level data, streamed from ECMWF's ARCO Zarr store (geo-chunked,
+time-series optimised). Only the requested statistics are saved; the hourly
+data are never written to disk.
 
 Any variable of the store, any years from 1940, any region:
   --area N W S E                 a box, or
@@ -9,31 +11,38 @@ Any variable of the store, any years from 1940, any region:
                                  (columns decimalLatitude, decimalLongitude;
                                  tab-separated, as GBIF SIMPLE_CSV).
 
-Monthly statistics (hourly data, UTC days):
+--frequency monthly (default), statistics from hourly data over UTC days:
   mean            monthly mean of hourly values
   sum             monthly total (accumulated variables, e.g. tp)
-  daily_min_mean  monthly mean of daily minimum   (instantaneous variables only)
-  daily_max_mean  monthly mean of daily maximum   (instantaneous variables only)
-  daily_max_max   monthly maximum of daily maximum (instantaneous variables only)
-Accumulated variables (GRIB stepType "accum", e.g. tp) hold the amount for the
-hour ending at their time stamp, so each value is assigned to the month of t - 1 h.
+  daily_min_mean  monthly mean of daily minimum    (instantaneous variables)
+  daily_max_mean  monthly mean of daily maximum    (instantaneous variables)
+  daily_max_max   monthly maximum of daily maximum (instantaneous variables)
+  -> <output-dir>/era5_<var>_<stat>_monthly_<start>_<end>.nc
 
-Output: one NetCDF per (variable, statistic) in --outdir,
-  era5_<var>_<stat>_monthly_<start>_<end>.nc, dims (time, lat, lon), in the
-store's native units (e.g. K, m). Points outside the fetched tiles are NaN.
+--frequency daily, per UTC day:
+  mean, sum, min, max of the hourly values
+  -> <output-dir>/era5_<var>_<stat>_daily_<year>.nc   (one file per year)
+
+Accumulated variables (GRIB stepType "accum", e.g. tp, ssrd) hold the amount
+for the hour ending at their time stamp, so each value is assigned to the day
+or month of t - 1 h. Output dims (time, lat, lon), in the store's native units
+(e.g. K, m, J m**-2). Points outside the fetched tiles are NaN.
 
 Authentication: CDS API key from --credentials-file (JSON {"key": "..."});
 without it, CDSAPI_KEY or the `key:` line of ~/.cdsapirc.
 The store rate-limits per key, so requests are sent one at a time, paced,
 and retried with back-off on 403/429/5xx.
 
-Example:
-  python era5_monthly.py --variables '{"t2m": ["mean"], "tp": ["sum"]}' \
+Examples:
+  python era5_retrieve.py --variables '{"t2m": ["mean"], "tp": ["sum"]}' \
       --years 2000 2001 --area 44 -10 36 4 --credentials-file cds_credentials.json
+  python era5_retrieve.py --frequency daily --variables '{"t2m": ["min", "max"]}' \
+      --years 2020 2020 --area 44 -10 36 4 --credentials-file cds_credentials.json
 """
 
 import argparse
 import asyncio
+import calendar
 import json
 import os
 import time
@@ -49,8 +58,14 @@ STORE_URL = (
     "https://arco.datastores.ecmwf.int/cadl-arco-geo-002/arco/"
     "reanalysis_era5_single_levels/sfc/geoChunked.zarr"
 )
-DAILY_STATS = {"daily_min_mean", "daily_max_mean", "daily_max_max"}
-ALL_STATS = {"mean", "sum"} | DAILY_STATS
+MONTHLY_DAILY_STATS = {"daily_min_mean", "daily_max_mean", "daily_max_max"}
+STATS = {
+    "monthly": {"mean", "sum"} | MONTHLY_DAILY_STATS,
+    "daily": {"mean", "sum", "min", "max"},
+}
+REDUCE = {"sum": np.add, "mean": np.add, "min": np.minimum, "max": np.maximum,
+          "daily_max_max": np.maximum}
+FILL = {"min": np.inf, "max": -np.inf, "daily_max_max": -np.inf}
 
 
 class ThrottledHTTP(HTTPFileSystem):
@@ -136,24 +151,27 @@ def run_starts(labels):
 
 
 def main() -> None:
-    p = argparse.ArgumentParser(description="Generic ERA5 monthly retrieval (ARCO Zarr)")
+    p = argparse.ArgumentParser(description="Generic ERA5 retrieval (ARCO Zarr)")
     p.add_argument("--variables", required=True,
                    help='JSON {variable: [statistics]}, e.g. \'{"t2m": ["mean"]}\'')
+    p.add_argument("--frequency", choices=("monthly", "daily"), default="monthly")
     p.add_argument("--years", nargs=2, type=int, required=True, metavar=("START", "END"))
     region = p.add_mutually_exclusive_group(required=True)
     region.add_argument("--area", nargs=4, type=float, metavar=("N", "W", "S", "E"))
     region.add_argument("--occurrences", help="CSV with decimalLatitude/decimalLongitude")
     p.add_argument("--buffer", type=float, default=1.0, help="degrees around occurrences")
     p.add_argument("--credentials-file", type=Path, help='JSON {"key": "<CDS API key>"}')
-    p.add_argument("--output-dir", default="data/era5_monthly")
+    p.add_argument("--output-dir", default="data/era5")
     a = p.parse_args()
 
+    freq = a.frequency
     variables = json.loads(a.variables)
     start, end = a.years
     for var, stats in variables.items():
-        bad = set(stats) - ALL_STATS
+        bad = set(stats) - STATS[freq]
         if bad:
-            raise SystemExit(f"{var}: unknown statistics {sorted(bad)}; choose from {sorted(ALL_STATS)}")
+            raise SystemExit(f"{var}: statistics {sorted(bad)} not available for {freq} output; "
+                             f"choose from {sorted(STATS[freq])}")
 
     ds = open_store(cds_api_key(a.credentials_file))
     missing = [v for v in variables if v not in ds]
@@ -167,8 +185,8 @@ def main() -> None:
         raise SystemExit("Store time chunks are not aligned to UTC days")
     accum = {v: ds[v].attrs.get("GRIB_stepType") == "accum" for v in variables}
     for v, stats in variables.items():
-        if accum[v] and set(stats) & DAILY_STATS:
-            raise SystemExit(f"{v} is accumulated: use 'sum' or 'mean', not daily statistics")
+        if accum[v] and set(stats) & MONTHLY_DAILY_STATS:
+            raise SystemExit(f"{v} is accumulated: use 'sum' or 'mean' for monthly output")
 
     if a.area is not None:
         tiles = select_tiles(lat_axis, lon_axis, (tlat, tlon), area=a.area)
@@ -180,8 +198,9 @@ def main() -> None:
     ti, tj = np.array([t[0] for t in tiles]), np.array([t[1] for t in tiles])
     i_lo, i_hi = ti.min() * tlat, (ti.max() + 1) * tlat
     j_lo, j_hi = tj.min() * tlon, (tj.max() + 1) * tlon
+    ny, nx = i_hi - i_lo, j_hi - j_lo
     print(f"{len(tiles)} store tiles, box lat {lat_axis[i_lo]:.2f}..{lat_axis[i_hi - 1]:.2f}, "
-          f"lon {lon_axis[j_lo]:.2f}..{lon_axis[j_hi - 1]:.2f}", flush=True)
+          f"lon {lon_axis[j_lo]:.2f}..{lon_axis[j_hi - 1]:.2f}; {freq} output", flush=True)
 
     i0 = times.searchsorted(pd.Timestamp(f"{start}-01-01"))
     i1 = times.searchsorted(pd.Timestamp(f"{end + 1}-01-01"))
@@ -190,20 +209,81 @@ def main() -> None:
     if not (np.diff(times[i0:i1 + 1].values).astype("timedelta64[h]") == np.timedelta64(1, "h")).all():
         raise SystemExit("Hourly time axis has gaps in the requested period")
 
-    months = pd.period_range(f"{start}-01", f"{end}-12", freq="M")
-    n_m, ny, nx = len(months), i_hi - i_lo, j_hi - j_lo
-    acc, cnt = {}, {}
-    for v, stats in variables.items():
-        for s in stats:
-            fill = -np.inf if s == "daily_max_max" else 0.0
-            acc[v, s] = np.full((n_m, ny, nx), fill)
-            cnt[v, s] = np.zeros(n_m, dtype=np.int64)
     filled = np.zeros((ny, nx), dtype=bool)
     for i, j in tiles:
         filled[i * tlat - i_lo:(i + 1) * tlat - i_lo, j * tlon - j_lo:(j + 1) * tlon - j_lo] = True
+    out = Path(a.output_dir)
+    out.mkdir(parents=True, exist_ok=True)
+    lat_out, lon_out = lat_axis[i_lo:i_hi], lon_axis[j_lo:j_hi]
 
-    def month_index(ts):
-        return (ts.year - start) * 12 + ts.month - 1
+    def save(v, s, vals, time_coord, fname):
+        vals = vals.astype(np.float32)
+        vals[:, ~filled] = np.nan
+        da = xr.DataArray(vals, dims=("time", "lat", "lon"), name=v,
+                          coords={"time": time_coord, "lat": lat_out, "lon": lon_out}, attrs={
+            "units": ds[v].attrs.get("units", ""),
+            "long_name": f"{ds[v].attrs.get('long_name', v)}, {freq} {s.replace('_', ' ')}",
+            "statistic": s, "frequency": freq,
+            "source": f"ERA5 hourly (reanalysis-era5-single-levels), ECMWF ARCO Zarr {STORE_URL}",
+        })
+        da.to_netcdf(out / fname)
+        print(f"Saved {out / fname}", flush=True)
+
+    # Periods: months, or days, counted from start-01-01.
+    first_day = pd.Timestamp(f"{start}-01-01")
+    if freq == "monthly":
+        periods = pd.period_range(f"{start}-01", f"{end}-12", freq="M")
+        def period_index(ts):
+            return (ts.year - start) * 12 + ts.month - 1
+    else:
+        periods = pd.date_range(first_day, f"{end}-12-31", freq="D")
+        def period_index(ts):
+            return ((ts - first_day) // pd.Timedelta(days=1)).to_numpy()
+    n_p = len(periods)
+    hours = {v: np.zeros(n_p, dtype=np.int64) for v in variables}   # hourly values seen
+    days_seen = {v: np.zeros(n_p, dtype=np.int64) for v in variables}
+
+    # Accumulators. Monthly: whole period. Daily: one block per year, saved
+    # and freed as soon as the year is complete.
+    acc = {}
+    def accumulator(v, s, year=None):
+        key = (v, s, year)
+        if key not in acc:
+            n = n_p if year is None else (366 if calendar.isleap(year) else 365)
+            acc[key] = np.full((n, ny, nx), FILL.get(s, 0.0),
+                               dtype=np.float64 if year is None else np.float32)
+        return acc[key]
+
+    year_first = {y: (pd.Timestamp(f"{y}-01-01") - first_day).days for y in range(start, end + 1)}
+
+    def add_daily(v, s, day_idx, vals, ys, xs):
+        """Merge per-day results (days day_idx) into the per-year accumulators."""
+        years = periods[day_idx].year
+        for y in np.unique(years):
+            m = years == y
+            block = accumulator(v, s, int(y))[:, ys, xs]
+            rows = day_idx[m] - year_first[int(y)]
+            if s in ("sum", "mean"):
+                block[rows] += vals[m]
+            else:
+                block[rows] = REDUCE[s](block[rows], vals[m])
+            accumulator(v, s, int(y))[:, ys, xs] = block
+
+    def flush_years(processed_upto):
+        """Save daily files for every year whose hours have all been read."""
+        any_accum = any(accum.values())
+        for y in range(start, end + 1):
+            y_end = times.searchsorted(pd.Timestamp(f"{y + 1}-01-01")) + (1 if any_accum else 0)
+            keys = [k for k in acc if k[2] == y]
+            if not keys or processed_upto < y_end:
+                continue
+            first, ndays = year_first[y], len(acc[keys[0]])
+            for v, s, _ in keys:
+                assert (hours[v][first:first + ndays] == 24).all(), f"{v} {y}: incomplete days"
+                vals = acc.pop((v, s, y))
+                if s == "mean":
+                    vals = vals / 24.0
+                save(v, s, vals, periods[first:first + ndays], f"era5_{v}_{s}_daily_{y}.nc")
 
     k0, k1 = i0 // tchunk, i1 // tchunk
     t_start = time.monotonic()
@@ -215,60 +295,54 @@ def main() -> None:
             if b_ <= a_:
                 continue
             ts = times[a_:b_] - pd.Timedelta(hours=1) if accum[v] else times[a_:b_]
-            mi_hr = month_index(ts)
-            hr_starts = run_starts(mi_hr)
-            mi_day = month_index(times[a_:b_:24]) if not accum[v] else None
-            day_starts = run_starts(mi_day) if mi_day is not None else None
+            p_hr = period_index(ts)
+            hr_starts = run_starts(p_hr)
+            if freq == "monthly" and set(stats) & MONTHLY_DAILY_STATS:
+                p_day = period_index(times[a_:b_:24])
+                day_starts = run_starts(p_day)
             for n, (i, j) in enumerate(tiles, 1):
                 h = ds[v][a_:b_, i * tlat:(i + 1) * tlat, j * tlon:(j + 1) * tlon].values.astype(np.float64)
                 ys = slice(i * tlat - i_lo, (i + 1) * tlat - i_lo)
                 xs = slice(j * tlon - j_lo, (j + 1) * tlon - j_lo)
-                if {"mean", "sum"} & set(stats):
-                    s_hr = np.add.reduceat(h, hr_starts, axis=0)
-                    for s in {"mean", "sum"} & set(stats):
-                        acc[v, s][mi_hr[hr_starts], ys, xs] += s_hr
-                if set(stats) & DAILY_STATS:
-                    d = h.reshape(-1, 24, tlat, tlon)
-                    if "daily_min_mean" in stats:
-                        acc[v, "daily_min_mean"][mi_day[day_starts], ys, xs] += np.add.reduceat(d.min(1), day_starts, axis=0)
-                    dmax = d.max(1)
-                    if "daily_max_mean" in stats:
-                        acc[v, "daily_max_mean"][mi_day[day_starts], ys, xs] += np.add.reduceat(dmax, day_starts, axis=0)
-                    if "daily_max_max" in stats:
-                        m = mi_day[day_starts]
-                        acc[v, "daily_max_max"][m, ys, xs] = np.maximum(
-                            acc[v, "daily_max_max"][m, ys, xs], np.maximum.reduceat(dmax, day_starts, axis=0))
+                for s in stats:
+                    if freq == "daily":
+                        add_daily(v, s, p_hr[hr_starts], REDUCE[s].reduceat(h, hr_starts, axis=0), ys, xs)
+                    elif s in ("mean", "sum"):
+                        accumulator(v, s)[p_hr[hr_starts], ys, xs] += np.add.reduceat(h, hr_starts, axis=0)
+                    else:   # monthly statistics of daily min / max
+                        d = h.reshape(-1, 24, tlat, tlon)
+                        daily = d.min(1) if s == "daily_min_mean" else d.max(1)
+                        m = p_day[day_starts]
+                        if s == "daily_max_max":
+                            accumulator(v, s)[m, ys, xs] = np.maximum(
+                                accumulator(v, s)[m, ys, xs], np.maximum.reduceat(daily, day_starts, axis=0))
+                        else:
+                            accumulator(v, s)[m, ys, xs] += np.add.reduceat(daily, day_starts, axis=0)
                 if n % 25 == 0 or n == len(tiles):
                     print(f"  {v} {times[a_]:%Y-%m}..{times[b_ - 1]:%Y-%m}: {n}/{len(tiles)} tiles "
                           f"({(time.monotonic() - t_start) / 60:.1f} min)", flush=True)
-            hours = np.diff(np.r_[hr_starts, len(mi_hr)])
-            for s in stats:
-                if s in ("mean", "sum"):
-                    cnt[v, s][mi_hr[hr_starts]] += hours
-                else:
-                    cnt[v, s][mi_day[day_starts]] += np.diff(np.r_[day_starts, len(mi_day)])
+            hours[v][p_hr[hr_starts]] += np.diff(np.r_[hr_starts, len(p_hr)])
+            if freq == "monthly" and set(stats) & MONTHLY_DAILY_STATS:
+                days_seen[v][p_day[day_starts]] += np.diff(np.r_[day_starts, len(p_day)])
+        if freq == "daily":
+            flush_years(min((k + 1) * tchunk, i1 + 1))
 
-    ndays = months.days_in_month.values
-    out = Path(a.output_dir)
-    out.mkdir(parents=True, exist_ok=True)
-    coords = {"time": months.to_timestamp(how="start") + pd.Timedelta(days=14),
-              "lat": lat_axis[i_lo:i_hi], "lon": lon_axis[j_lo:j_hi]}
-    for (v, s), vals in acc.items():
-        expected = ndays * 24 if s in ("mean", "sum") else ndays
-        assert (cnt[v, s] == expected).all(), f"{v} {s}: incomplete months"
-        if s in ("mean", "daily_min_mean", "daily_max_mean"):
-            vals = vals / cnt[v, s][:, None, None]
-        vals = vals.astype(np.float32)
-        vals[:, ~filled] = np.nan
-        da = xr.DataArray(vals, dims=("time", "lat", "lon"), coords=coords, name=v, attrs={
-            "units": ds[v].attrs.get("units", ""),
-            "long_name": f"{ds[v].attrs.get('long_name', v)}, monthly {s.replace('_', ' ')}",
-            "statistic": s,
-            "source": f"ERA5 hourly (reanalysis-era5-single-levels), ECMWF ARCO Zarr {STORE_URL}",
-        })
-        f = out / f"era5_{v}_{s}_monthly_{start}_{end}.nc"
-        da.to_netcdf(f)
-        print(f"Saved {f} ({f.stat().st_size / 1e6:.1f} MB)")
+    if freq == "daily":
+        assert not acc, f"years left unsaved: {sorted({k[2] for k in acc})}"
+        return
+
+    ndays = periods.days_in_month.values
+    for (v, s, _), vals in acc.items():
+        if s in ("mean", "sum"):
+            assert (hours[v] == ndays * 24).all(), f"{v}: incomplete months"
+        else:
+            assert (days_seen[v] == ndays).all(), f"{v} {s}: incomplete months"
+        if s == "mean":
+            vals = vals / hours[v][:, None, None]
+        elif s in ("daily_min_mean", "daily_max_mean"):
+            vals = vals / days_seen[v][:, None, None]
+        save(v, s, vals, periods.to_timestamp(how="start") + pd.Timedelta(days=14),
+             f"era5_{v}_{s}_monthly_{start}_{end}.nc")
 
 
 if __name__ == "__main__":
