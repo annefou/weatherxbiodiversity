@@ -14,8 +14,8 @@
 # %% [markdown]
 # # Step 2b: Stream ERA5 daily maximum temperature from ECMWF's ARCO Zarr store
 #
-# A faster alternative to `02_download_era5.py` and `../download_era5_daily.py`,
-# which queue CDS requests and take about 27 h for 1959–2024. Here, nothing is
+# A faster alternative to `02_download_era5.py`, which queues one CDS request
+# per year and takes about 27 h for 1959–2024. Here, nothing is
 # requested from CDS: only the Zarr chunks covering the Iberian box are read
 # from the geo-chunked (time-series optimised) ERA5 single-levels store hosted
 # by ECMWF. The full period takes about a minute.
