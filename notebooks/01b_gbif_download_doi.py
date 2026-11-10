@@ -31,6 +31,14 @@
 #
 # The download itself is asynchronous on GBIF's side; this script submits
 # the query then polls for completion (5–30 min typical).
+#
+# > [!WARNING]
+# > This script does **not** download the occurrence data. It mints the
+# > DOI and writes the metadata (`../data/gbif_bombus_iberia_metadata.json`)
+# > only. The zipped data stays on GBIF's servers; fetch it with the
+# > `curl` command printed at the end of this script and unpack it into
+# > `../data/gbif_dl/`, which is where `soroye_port/01_clean_data_iberia.py`
+# > and `02c_stream_era5_monthly_climate.py` expect it.
 
 # %%
 import json
@@ -162,3 +170,17 @@ metadata = {
 META_FILE.write_text(json.dumps(metadata, indent=2, default=str))
 print(f"\nMetadata saved: {META_FILE}")
 print(f"Citation:       {metadata['citation']}")
+
+# %% [markdown]
+# ## 4. Fetch the data itself
+#
+# The DOI mints a permanent snapshot on GBIF's servers; nothing has been
+# downloaded yet. Run the commands below (also printed at the end) to
+# fetch the zip and unpack it where the pipeline expects it.
+
+# %%
+dl_dir = OUTDIR / "gbif_dl"
+print("\n01b did NOT download the data. To fetch it, run:")
+print(f"  mkdir -p {dl_dir}")
+print(f"  curl -L -o {dl_dir / (download_key + '.zip')} \"{download_url}\"")
+print(f"  unzip -q {dl_dir / (download_key + '.zip')} -d {dl_dir}/")
