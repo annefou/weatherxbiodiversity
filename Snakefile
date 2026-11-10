@@ -79,14 +79,22 @@ rule port_climate:
         f"cd {PORT} && OUT_SUBDIR=outputs_iberia python 04_climate_tei_pei.py"
 
 
-rule port_regression:
+rule port_dataglmm:
     input:
         f"{PORT}/outputs_iberia/presence_absence.npz",
         f"{PORT}/outputs_iberia/sampling_continent.npz",
         f"{PORT}/outputs_iberia/climate_tei_pei.npz",
     output:
-        f"{PORT}/outputs_iberia/posterior_vb_summary.csv",
         f"{PORT}/outputs_iberia/dataGLMM_extinction.parquet",
+    shell:
+        f"cd {PORT} && OUT_SUBDIR=outputs_iberia python 05a_build_dataGLMM.py"
+
+
+rule port_regression:
+    input:
+        f"{PORT}/outputs_iberia/dataGLMM_extinction.parquet",
+    output:
+        f"{PORT}/outputs_iberia/posterior_vb_summary.csv",
     shell:
         f"cd {PORT} && OUT_SUBDIR=outputs_iberia python 05b_regression_statsmodels.py"
 
