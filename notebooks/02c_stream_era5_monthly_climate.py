@@ -54,14 +54,48 @@
 # `ERA5_START` / `ERA5_END` environment variables override the period.
 
 # %%
+import asyncio
 import os
+import time
 from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 
 import numpy as np
 import pandas as pd
 import xarray as xr
+import zarr
+from fsspec.implementations.http import HTTPFileSystem
 from pyproj import Transformer
+
+# The ARCO store rate-limits per key: bursts of parallel GETs, and even
+# fast sequential GETs, return 403 (with a ~2 min cool-down). Serialise
+# zarr, pace requests, and back off on 403/429/5xx.
+zarr.config.set({"async.concurrency": 1})
+
+
+class ThrottledHTTP(HTTPFileSystem):
+    MIN_INTERVAL = 0.5
+    RETRY = {403, 429, 500, 502, 503}
+
+    def __init__(self, *a, **kw):
+        self._last = 0.0
+        super().__init__(*a, **kw)
+
+    async def _cat_file(self, url, start=None, end=None, **kw):
+        for attempt in range(8):
+            gap = self.MIN_INTERVAL - (time.monotonic() - self._last)
+            if gap > 0:
+                await asyncio.sleep(gap)
+            try:
+                r = await super()._cat_file(url, start, end, **kw)
+                self._last = time.monotonic()
+                return r
+            except Exception as e:
+                self._last = time.monotonic()
+                if getattr(e, "status", None) in self.RETRY and attempt < 7:
+                    await asyncio.sleep(30 * (2 ** attempt))
+                    continue
+                raise
 
 # %% [markdown]
 # ## Configuration
@@ -81,7 +115,7 @@ START = int(os.environ.get("ERA5_START", 1940))
 END = int(os.environ.get("ERA5_END", 2014))
 GBIF_CSV = DATA / "gbif_dl" / "0006204-260423192947929.csv"
 OUTDIR = Path(os.environ.get("ERA5_OUTDIR", DATA / "era5_monthly"))
-WORKERS = 32  # concurrent tile reads
+WORKERS = 1  # concurrent tile reads; the ARCO store 403s above ~10 in flight
 
 # CEA grid — identical to soroye_port/02_presence_absence.py
 RES_M = 100_000
@@ -109,11 +143,16 @@ def cds_api_key() -> str:
     )
 
 
+fs = ThrottledHTTP(
+    asynchronous=True,
+    headers={"Authorization": f"Bearer {cds_api_key()}"},
+)
+store = zarr.storage.FsspecStore(fs=fs, path=STORE_URL)
+
 ds = xr.open_zarr(
-    STORE_URL,
+    store,
     consolidated=True,
     chunks=None,
-    storage_options={"headers": {"Authorization": f"Bearer {cds_api_key()}"}},
 )
 lat_axis = ds["latitude"].values
 lon_axis = ds["longitude"].values
