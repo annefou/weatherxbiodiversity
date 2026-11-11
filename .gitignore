@@ -44,5 +44,8 @@ science.aax8591.pdf
 credentials/*.json
 !credentials/*.example.json
 
+# Marker written by the workflow after extracting the Figshare tables
+reference/.figshare_*
+
 # Workflow re-runs (compared against the committed published results)
 soroye_port/run/

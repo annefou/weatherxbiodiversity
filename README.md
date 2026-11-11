@@ -90,7 +90,7 @@ pixi install
 #    https://doi.org/10.6084/m9.figshare.9956471 and save it as
 #    reference/Bumblebee_repo.zip (or set FIGSHARE_ZIP=/path/to/zip).
 
-# 3. Credentials (files are gitignored):
+# 3. Credentials, required for the steps that use them (files are gitignored):
 cp credentials/cds_credentials.example.json credentials/cds_credentials.json    # ERA5: your CDS API key
 cp credentials/gbif_credentials.example.json credentials/gbif_credentials.json  # only for a new GBIF download
 #    The default GBIF download (DOI 10.15468/dl.3frmsq) is public: no login needed.

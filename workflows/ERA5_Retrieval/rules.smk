@@ -40,7 +40,12 @@ rule era5_retrieve:
     params:
         variables=json.dumps(ERA5["variables"]),
         region=era5_region(),
+        credentials=ERA5["credentials_file"],
     shell:
+        # The CDS credentials file is required (recommended over ~/.cdsapirc).
+        "test -f {params.credentials} || {{ echo 'Missing {params.credentials}: copy "
+        "credentials/cds_credentials.example.json to it and put your CDS API key in it "
+        "(https://cds.climate.copernicus.eu/profile).' >&2; exit 1; }}; "
         "python workflows/ERA5_Retrieval/era5_retrieve.py --frequency " + ERA5_FREQ +
         " --variables '{params.variables}' "
         f"--years {ERA5_START} {ERA5_END} {{params.region}} "
