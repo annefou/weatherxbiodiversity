@@ -44,6 +44,15 @@ climate:
     plot_title: "Iberian Bombus: Soroye et al. (2020) replication with CRU TS"
     plot_subtitle: "Iberia, GBIF-observed Bombus species, CRU TS 3.24.01 climate (1901-2015), 100 km grid"
     plot_color: "#2b83ba"
+  cru_1940:
+    # CRU TS restricted to ERA5's years: separates the climate dataset from the
+    # period (ERA5 starts in 1940: baseline climate 1940-1974, limits 1940-2014).
+    period_of: cru
+    label: "CRU TS, 1940-2014 only"
+    years: [1940, 2014]
+    plot_title: "Iberian Bombus: CRU TS restricted to ERA5's years (1940-2014)"
+    plot_subtitle: "Iberia, GBIF-observed Bombus species, CRU TS 3.24.01 climate (1940-2014), 100 km grid"
+    plot_color: "#7b3294"
   era5:
     label: "ERA5"
     years: [1940, 2014]
@@ -52,7 +61,7 @@ climate:
     plot_color: "#d7191c"
 
 analysis:
-  sources: [cru, era5]
+  sources: [cru, cru_1940, era5]
   continent: 2                     # Soroye's continent code for Europe
   grid_resolution_m: 100000        # published 100 km cylindrical equal-area raster
   grid_bbox: [-20037507, 20062493, -5263885, 6336115]

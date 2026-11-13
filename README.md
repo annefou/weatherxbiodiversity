@@ -61,14 +61,17 @@ The port in `soroye_port/` mirrors Soroye et al.'s R scripts 1–5:
 
 **Climate data sensitivity** — the workflow (same Iberia GBIF records as Phase 3, same code), with the paper's climate data and with ERA5:
 
-| Climate data | `sc_TEI_delta` | Model rows | Claim |
-|---|---|---|---|
-| CRU TS 3.24.01 (paper) | **+0.48 [0.26, 0.69]** | 528 | replicates |
-| ERA5 (1940–2014) | **−0.05 [−0.24, 0.14]** | 679 | does not replicate |
+| Climate data | `sc_TEI_delta`, all rows | Rows | Same 528 rows | Claim |
+|---|---|---|---|---|
+| CRU TS 3.24.01 (paper) | **+0.48 [0.26, 0.69]** | 528 | +0.48 | replicates |
+| CRU TS, 1940–2014 only | **+0.46 [0.25, 0.67]** | 528 | +0.46 | replicates |
+| ERA5 (1940–2014) | **−0.05 [−0.24, 0.14]** | 679 | +0.05 [−0.16, 0.26] | does not replicate |
 
-The regional replication of Soroye's claim depends on the climate dataset.
-CRU TS is land-only, so the ERA5 run also includes coastal grid cells (679
-instead of 528 model rows). See `results/iberia/comparison/` after a run.
+The regional replication of Soroye's claim depends on the climate dataset,
+not on the baseline period (CRU TS on ERA5's years still replicates) or the
+coverage (CRU TS is land-only; on the same 528 rows ERA5 still does not
+replicate). See [Phase 4](https://annefou.github.io/weatherxbiodiversity/phase4/)
+and `results/iberia/comparison/` after a run.
 
 See `soroye_port/phase2_forest.png` and `phase3_forest.png` for full coefficient forest plots.
 

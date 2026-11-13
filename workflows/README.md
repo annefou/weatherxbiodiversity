@@ -16,7 +16,7 @@ Here each step also has a `rules.smk` (Snakemake), included by the root
 | `Analysis` | `analysis_01_study_records` … `analysis_06_forest_plot` | `01_study_records.py` … `06_forest_plot.py` |
 | `CRU_Retrieval` | `cru_retrieval` | `cru_retrieve.py` (CRU TS 3.24.01 from UEA) |
 | `CRU_Preprocessing` | `cru_preprocessing` | `cru_to_climate.py` |
-| `Comparison` | `comparison` | `compare_sources.py` |
+| `Comparison` | `comparison`, `comparison_common_rows`, `comparison_common_rows_fit`, `comparison_common`, `climate_period` | `compare_sources.py`, `common_rows.py`, `climate_period.py` |
 
 To run a step with CWL instead (as in the ARC): `cwltool workflows/<Step>/workflow.cwl <job.yml>`;
 the whole chain is `workflows/orchestration.cwl`. The step READMEs come from the
