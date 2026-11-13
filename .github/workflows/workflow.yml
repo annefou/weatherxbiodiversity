@@ -1,0 +1,79 @@
+name: Workflow
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  workflow:
+    name: Workflow (pixi.lock, no credentials)
+    runs-on: ubuntu-latest
+    env:
+      HAS_CDS_KEY: ${{ secrets.CDS_API_KEY != '' }}   # only whether the secret exists
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: prefix-dev/setup-pixi@v0.11.2
+        with:
+          pixi-version: v0.76.2
+          locked: true
+          cache: true
+
+      - name: Whole chain is wired (dry run)
+        run: pixi run snakemake --cores 1 -n
+
+      - name: GBIF retrieval and preprocessing, Analysis 01-03 (public Phase 3 download)
+        run: >
+          pixi run snakemake --cores 1
+          results/iberia/common/presence_absence.npz
+          results/iberia/common/sampling_continent.npz
+
+      - name: Expected records (Phase 3 download, 1901-2014, study tables)
+        run: |
+          pixi run python - <<'EOF'
+          import pandas as pd
+          occ = pd.read_csv("results/iberia/gbif/occurrences_clean.csv")
+          rec = pd.read_csv("results/iberia/common/clean_records.csv")
+          print(f"occurrences_clean: {len(occ)} rows, {occ.species.nunique()} species")
+          print(f"clean_records:     {len(rec)} rows, {rec.species.nunique()} species")
+          assert (len(occ), occ.species.nunique()) == (13807, 31)
+          assert (len(rec), rec.species.nunique()) == (7487, 31)
+          EOF
+
+      - name: ERA5 preprocessing on the step's test data
+        run: >
+          pixi run python workflows/ERA5_Preprocessing/era5_to_climate.py
+          --input-dir workflows/ERA5_Preprocessing/test_data --years 2020 2020
+          --output-dir ci_out/era5_climate
+
+      - name: CWL descriptions are valid
+        run: |
+          for f in $(find workflows -name "*.cwl" | sort); do
+            pixi exec -s python=3.12 -s cwltool -s nodejs cwltool --validate "$f" 2>&1 | tail -1
+          done
+
+      - name: ERA5 retrieval, small job (only if the CDS_API_KEY secret is set)
+        if: env.HAS_CDS_KEY == 'true'
+        env:
+          CDS_API_KEY: ${{ secrets.CDS_API_KEY }}
+        run: |
+          umask 077
+          python3 -c 'import json, os; json.dump({"key": os.environ["CDS_API_KEY"]}, open("credentials/cds_credentials.json", "w"))'
+          pixi run snakemake era5_retrieval --cores 1 --configfile config/iberia.yaml .github/ci/era5_small.yaml
+          rm -f credentials/cds_credentials.json
+          ls data/era5/
+
+  docker:
+    name: Docker image builds (pixi.lock)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: docker/setup-buildx-action@v3
+      - uses: docker/build-push-action@v6
+        with:
+          context: .
+          push: false
+          tags: weatherxbiodiversity:ci

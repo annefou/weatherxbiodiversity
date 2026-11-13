@@ -1,13 +1,12 @@
-FROM mambaorg/micromamba:1.5-jammy
-
-COPY --chown=$MAMBA_USER:$MAMBA_USER environment.yml /tmp/environment.yml
-RUN micromamba install -y -n base -f /tmp/environment.yml && \
-    micromamba clean --all --yes
+# The workflow's environment, exactly as pinned by pixi.lock.
+FROM ghcr.io/prefix-dev/pixi:0.76.2
 
 WORKDIR /app
-COPY --chown=$MAMBA_USER:$MAMBA_USER . /app
+COPY pixi.toml pixi.lock ./
+RUN pixi install --locked && rm -rf /root/.cache/rattler
 
-# CDS API key must be mounted at runtime:
-#   docker run -v ~/.cdsapirc:/home/mambauser/.cdsapirc weatherxbio
-ENTRYPOINT ["/usr/local/bin/_entrypoint.sh"]
-CMD ["snakemake", "--cores", "1"]
+COPY . /app
+
+# Credentials are never in the image: mount them at run time, e.g.
+#   docker run -v $PWD/credentials:/app/credentials:ro -v $PWD/results:/app/results weatherxbiodiversity
+CMD ["pixi", "run", "--locked", "snakemake", "--cores", "1"]

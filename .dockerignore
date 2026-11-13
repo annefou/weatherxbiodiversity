@@ -1,0 +1,17 @@
+# Never in the image: credentials, local data and results, environments, VCS
+credentials/*.json
+!credentials/*.example.json
+**/credentials.json
+**/gbif_credentials*.json
+!**/gbif_credentials.example.json
+data/
+results/
+.pixi/
+.snakemake/
+.git/
+_build/
+reference/
+soroye_port/run/
+soroye_port/outputs*/
+**/__pycache__/
+*.zip
