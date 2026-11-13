@@ -20,7 +20,10 @@ weatherxbiodiversity/
 │   ├── GBIF_Preprocessing/    Generic cleaning of the occurrence table
 │   ├── ERA5_Retrieval/        Monthly ERA5 statistics from ECMWF's ARCO Zarr store
 │   ├── ERA5_Preprocessing/    Monthly tmp/tmn/tmx/pre (common climate input format)
+│   ├── CRU_Retrieval/         CRU TS 3.24.01 (the paper's climate data) from UEA
+│   ├── CRU_Preprocessing/     The same variables from CRU TS (common climate input format)
 │   ├── Analysis/              01 study records ... 06 forest plot (Soroye et al. 2020)
+│   ├── Comparison/            The climate sources side by side
 │   └── orchestration.cwl      The whole chain in CWL
 ├── studies/soroye2020/        Study tables (species list, synonyms, dropped taxa,
 │                              erroneous observations; CC BY 4.0, Soroye et al. deposit)
@@ -56,6 +59,17 @@ The port in `soroye_port/` mirrors Soroye et al.'s R scripts 1–5:
 
 - `sc_TEI_delta` = **+0.48 [0.27, 0.69]** — **Soroye's claim replicates on Iberia**.
 
+**Climate data sensitivity** — the workflow (same Iberia GBIF records as Phase 3, same code), with the paper's climate data and with ERA5:
+
+| Climate data | `sc_TEI_delta` | Model rows | Claim |
+|---|---|---|---|
+| CRU TS 3.24.01 (paper) | **+0.48 [0.26, 0.69]** | 528 | replicates |
+| ERA5 (1940–2014) | **−0.05 [−0.24, 0.14]** | 679 | does not replicate |
+
+The regional replication of Soroye's claim depends on the climate dataset.
+CRU TS is land-only, so the ERA5 run also includes coastal grid cells (679
+instead of 528 model rows). See `results/iberia/comparison/` after a run.
+
 See `soroye_port/phase2_forest.png` and `phase3_forest.png` for full coefficient forest plots.
 
 ## Quick start
@@ -69,7 +83,8 @@ pixi install
 cp credentials/cds_credentials.example.json credentials/cds_credentials.json
 #    then put your key in it: {"key": "..."}
 
-# 3. Run the whole workflow (the ERA5 retrieval takes about 1.5 hours)
+# 3. Run the whole workflow: GBIF, CRU TS (the paper's climate data) and ERA5,
+#    the Analysis with each, and the comparison (the ERA5 retrieval takes about 1.5 hours)
 pixi run snakemake --cores 1
 pixi run snakemake --cores 1 -n                  # dry run
 pixi run snakemake --cores 1 gbif_preprocessing  # one step (rule names in workflows/*/rules.smk)
@@ -81,8 +96,9 @@ GBIF account. For a new download, set `gbif.download: null` in
 `config/iberia.yaml` and provide `credentials/gbif_credentials.json`.
 
 Results go to `results/iberia/` (git-ignored): `gbif/occurrences_clean.csv`,
-`common/` (study records, presence/absence, sampling effort) and, per climate
-source, `era5/` (TEI/PEI, model table, `posterior_vb_summary.csv`, `forest.png`).
+`common/` (study records, presence/absence, sampling effort); per climate
+source, `cru/` and `era5/` (TEI/PEI, model table, `posterior_vb_summary.csv`,
+`forest.png`); and `comparison/` (`coefficients.csv`, `forest_comparison.png`).
 Downloads go to `data/`.
 
 ## Prerequisites
@@ -97,7 +113,7 @@ Downloads go to `data/`.
 
 - **Biodiversity**: [GBIF Occurrence Download, *Bombus* in Spain and Portugal, georeferenced, no geospatial issues, 36,560 records](https://doi.org/10.15468/dl.3frmsq). Citation: *GBIF.org (2026-04-25) GBIF Occurrence Download https://doi.org/10.15468/dl.3frmsq* (licence CC BY-NC 4.0).
 - **Climate, workflow**: [ERA5 hourly data on single levels](https://doi.org/10.24381/cds.adbb2d47) (CC BY 4.0), 1940–2014, streamed from ECMWF's ARCO Zarr store and aggregated to monthly statistics.
-- **Climate, Phases 2 and 3 of the book**: CRU TS 3.24.01 monthly, as used by Soroye et al. (2020), from their data deposit (run by `soroye_port/`).
+- **Climate, the paper's data**: [CRU TS 3.24.01](https://crudata.uea.ac.uk/cru/data/hrg/cru_ts_3.24.01/) monthly (Open Database Licence), as used by Soroye et al. (2020), downloaded from the University of East Anglia by the workflow (Phases 2 and 3 of the book used the copy in their data deposit, via `soroye_port/`).
 - **Study tables**: from the data deposit of Soroye et al. (2020), [10.6084/m9.figshare.9956471](https://doi.org/10.6084/m9.figshare.9956471) (CC BY 4.0), in `studies/soroye2020/`.
 
 ## How to cite

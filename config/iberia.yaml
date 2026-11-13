@@ -28,17 +28,31 @@ era5:
     - [40.7, -32.3, 35.9, -24.0]   # Azores
   credentials: credentials/cds_credentials.json
 
+cru:
+  # CRU TS 3.24.01, the climate data of Soroye et al. (2020), from the University
+  # of East Anglia. Decades as in Soroye et al.'s data deposit (no 1981-1990).
+  decades: ["1901.1910", "1911.1920", "1921.1930", "1931.1940", "1941.1950", "1951.1960",
+            "1961.1970", "1971.1980", "1991.2000", "2001.2010", "2011.2015"]
+  bbox: [46, -34, 25, 7]           # [north, west, south, east] kept from the global files
+
 # Climate sources for the Analysis: each writes the common climate input
 # (data/climate/<source>/<source>_{tmp,tmn,tmx,pre}_monthly_<start>_<end>.nc).
 climate:
+  cru:
+    label: "CRU TS 3.24.01 (paper)"
+    years: [1901, 2015]
+    plot_title: "Iberian Bombus: Soroye et al. (2020) replication with CRU TS"
+    plot_subtitle: "Iberia, GBIF-observed Bombus species, CRU TS 3.24.01 climate (1901-2015), 100 km grid"
+    plot_color: "#2b83ba"
   era5:
+    label: "ERA5"
     years: [1940, 2014]
     plot_title: "Iberian Bombus: Soroye et al. (2020) replication with ERA5"
     plot_subtitle: "Iberia, GBIF-observed Bombus species, ERA5 climate (1940-2014), 100 km grid"
     plot_color: "#d7191c"
 
 analysis:
-  sources: [era5]
+  sources: [cru, era5]
   continent: 2                     # Soroye's continent code for Europe
   grid_resolution_m: 100000        # published 100 km cylindrical equal-area raster
   grid_bbox: [-20037507, 20062493, -5263885, 6336115]

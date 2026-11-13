@@ -7,8 +7,11 @@
 #   GBIF_Preprocessing  generic cleaning of the occurrence table
 #   ERA5_Retrieval      monthly ERA5 statistics from ECMWF's ARCO store
 #   ERA5_Preprocessing  monthly tmp / tmn / tmx / pre (common climate input)
+#   CRU_Retrieval       CRU TS 3.24.01 (the paper's climate data), from UEA
+#   CRU_Preprocessing   the same four variables from CRU TS
 #   Analysis            study records, presence/absence, sampling, TEI/PEI,
 #                       GLMM, forest plot (one run per climate source)
+#   Comparison          the climate sources side by side (same occurrences)
 #
 # Usage (with pixi):
 #   pixi run snakemake --cores 1             # everything
@@ -38,10 +41,15 @@ include: f"{W}/GBIF_Retrieval/rules.smk"
 include: f"{W}/GBIF_Preprocessing/rules.smk"
 include: f"{W}/ERA5_Retrieval/rules.smk"
 include: f"{W}/ERA5_Preprocessing/rules.smk"
+include: f"{W}/CRU_Retrieval/rules.smk"
+include: f"{W}/CRU_Preprocessing/rules.smk"
 include: f"{W}/Analysis/rules.smk"
+include: f"{W}/Comparison/rules.smk"
 
 
 rule all:
     input:
         expand(f"{RES}/{{source}}/posterior_vb_summary.csv", source=config["analysis"]["sources"]),
         expand(f"{RES}/{{source}}/forest.png", source=config["analysis"]["sources"]),
+        f"{RES}/comparison/coefficients.csv",
+        f"{RES}/comparison/forest_comparison.png",
