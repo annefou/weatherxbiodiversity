@@ -1,0 +1,19 @@
+# Synonyms merged into valid species names (according to the IUCN red list)
+# in the published Bombus replication.
+# Source: Soroye et al. (2020), 1_Cleandata_and_makeMCPs.R, in
+# Bumblebee_repo_wbombusdat (figshare 10.6084/m9.figshare.9956471); notes are
+# the original code comments. For a study of a different genus, supply an
+# equivalent file (or none).
+from	to	note
+ashtoni	bohemicus	
+californicus	fervidus	
+moderatus	cryptarum	IUCN redlist: conspecific with cryptarum
+sonorus	pensylvanicus	
+alboanalis	jonellus	
+wilmattae	ephippiatus	
+volucelloides	melaleucus	
+soroensis	soroeensis	misnamed/typo
+sichelii	sicheli	misnamed/typo
+wurfleni	wurflenii	misnamed/typo
+bannitus	muscorum	
+mocsaryi	laesus	

@@ -39,3 +39,14 @@ _build/
 
 # Local copy of paywalled reference paper
 science.aax8591.pdf
+
+# Credentials (templates: credentials/*.example.json); never commit
+credentials/*.json
+!credentials/*.example.json
+credentials.json
+gbif_credentials*.json
+!gbif_credentials.example.json
+
+# Workflow outputs (Snakefile): downloads in data/, results here
+results/*/
+!results/.gitkeep

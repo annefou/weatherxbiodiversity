@@ -1,0 +1,11 @@
+# Inputs are the outputs of steps 02/03/04 (see 02-/03-/04-*.yml).
+presence_absence:
+  class: File
+  path: out/presence_absence.npz
+sampling_continent:
+  class: File
+  path: out/sampling_continent.npz
+climate_tei_pei:
+  class: File
+  path: out/climate_tei_pei.npz
+output_dir: out

@@ -1,108 +1,47 @@
-# Snakefile — Soroye et al. (2020) replication for Iberian Bombus
+# Soroye et al. (2020) replication for Iberian Bombus: GBIF + climate -> analysis.
 #
-# The full replication happens in `soroye_port/`, which is a faithful Python
-# port of Soroye's R scripts. This Snakefile orchestrates the upstream data
-# download + the port's Phase-3 (Iberia) run.
+# The same scripts as the ARC (WeatherXBiodiversity_Soroye2020 on DataHUB), one
+# Snakemake file per step under workflows/<Step>/rules.smk, with the parameters
+# in config/iberia.yaml:
+#   GBIF_Retrieval      existing GBIF download (key/DOI), or a new request
+#   GBIF_Preprocessing  generic cleaning of the occurrence table
+#   ERA5_Retrieval      monthly ERA5 statistics from ECMWF's ARCO store
+#   ERA5_Preprocessing  monthly tmp / tmn / tmx / pre (common climate input)
+#   Analysis            study records, presence/absence, sampling, TEI/PEI,
+#                       GLMM, forest plot (one run per climate source)
 #
-# Usage:
-#   snakemake --cores 1                  # run everything
-#   snakemake --cores 1 -n               # dry run
-#   snakemake --cores 1 soroye_port/phase3_forest.png
+# Usage (with pixi):
+#   pixi run snakemake --cores 1             # everything
+#   pixi run snakemake --cores 1 -n          # dry run
+#   pixi run snakemake --cores 1 gbif_preprocessing   # one step
+#
+# Inputs: studies/soroye2020/ (study tables, in the repository); data/ (downloads);
+# results/<study>/ (outputs). Credentials (credentials/*.json, git-ignored):
+# CDS API key for ERA5; GBIF account only for a new GBIF download.
 
-NOTEBOOKS = "notebooks"
+import json
+
+configfile: "config/iberia.yaml"
+
 DATA = "data"
-RESULTS = "results"
-PORT = "soroye_port"
+RES = f"results/{config['study']}"
+W = "workflows"
+STUDY = config["study_tables"]
+
+
+def climate_files(source):
+    y0, y1 = config["climate"][source]["years"]
+    return [f"{DATA}/climate/{source}/{source}_{v}_monthly_{y0}_{y1}.nc" for v in ("tmp", "tmn", "tmx", "pre")]
+
+
+include: f"{W}/GBIF_Retrieval/rules.smk"
+include: f"{W}/GBIF_Preprocessing/rules.smk"
+include: f"{W}/ERA5_Retrieval/rules.smk"
+include: f"{W}/ERA5_Preprocessing/rules.smk"
+include: f"{W}/Analysis/rules.smk"
+
 
 rule all:
     input:
-        f"{PORT}/phase3_forest.png",
-        f"{PORT}/outputs_iberia/posterior_vb_summary.csv",
-
-
-rule download_gbif:
-    output:
-        f"{DATA}/gbif_bombus_iberia.csv",
-        f"{DATA}/gbif_bombus_iberia_metadata.json",
-    log:
-        f"{RESULTS}/logs/01_download_gbif.log",
-    shell:
-        """
-        cd {NOTEBOOKS} && jupytext --to notebook --execute 01_download_gbif.py 2>&1 | tee ../{log}
-        """
-
-
-# ERA5 daily max T via the CDS queue (one request per year, ~27 h),
-# then monthly max of daily max.
-rule download_era5:
-    output:
-        f"{DATA}/era5_iberia_monthly_tmax.nc",
-    shell:
-        f"cd {NOTEBOOKS} && python 02_download_era5.py"
-
-
-# --------- Phase 3: apply the Python port to Iberia data ---------
-
-rule port_clean:
-    input:
-        f"{DATA}/gbif_bombus_iberia.csv",
-    output:
-        f"{PORT}/outputs_iberia/bombus_clean.csv",
-    shell:
-        f"cd {PORT} && python 01_clean_data_iberia.py"
-
-
-rule port_presence:
-    input:
-        f"{PORT}/outputs_iberia/bombus_clean.csv",
-    output:
-        f"{PORT}/outputs_iberia/presence_absence.npz",
-    shell:
-        f"cd {PORT} && OUT_SUBDIR=outputs_iberia python 02_presence_absence.py"
-
-
-rule port_sampling:
-    input:
-        f"{PORT}/outputs_iberia/bombus_clean.csv",
-    output:
-        f"{PORT}/outputs_iberia/sampling_continent.npz",
-    shell:
-        f"cd {PORT} && OUT_SUBDIR=outputs_iberia python 03_sampling_continent.py"
-
-
-rule port_climate:
-    input:
-        f"{PORT}/outputs_iberia/presence_absence.npz",
-    output:
-        f"{PORT}/outputs_iberia/climate_tei_pei.npz",
-    shell:
-        f"cd {PORT} && OUT_SUBDIR=outputs_iberia python 04_climate_tei_pei.py"
-
-
-rule port_dataglmm:
-    input:
-        f"{PORT}/outputs_iberia/presence_absence.npz",
-        f"{PORT}/outputs_iberia/sampling_continent.npz",
-        f"{PORT}/outputs_iberia/climate_tei_pei.npz",
-    output:
-        f"{PORT}/outputs_iberia/dataGLMM_extinction.parquet",
-    shell:
-        f"cd {PORT} && OUT_SUBDIR=outputs_iberia python 05a_build_dataGLMM.py"
-
-
-rule port_regression:
-    input:
-        f"{PORT}/outputs_iberia/dataGLMM_extinction.parquet",
-    output:
-        f"{PORT}/outputs_iberia/posterior_vb_summary.csv",
-    shell:
-        f"cd {PORT} && OUT_SUBDIR=outputs_iberia python 05b_regression_statsmodels.py"
-
-
-rule port_plot:
-    input:
-        f"{PORT}/outputs_iberia/posterior_vb_summary.csv",
-    output:
-        f"{PORT}/phase3_forest.png",
-    shell:
-        f"cd {PORT} && python plot_forest.py"
+        expand(f"{RES}/{{source}}/posterior_vb_summary.csv", source=config["analysis"]["sources"]),
+        expand(f"{RES}/{{source}}/forest.png", source=config["analysis"]["sources"]),

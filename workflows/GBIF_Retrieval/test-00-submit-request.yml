@@ -1,0 +1,9 @@
+credentials_file:
+    class: File
+    path: gbif_credentials.json
+    # Note: the credentials file "gbif_credentials.json" should contain GBIF credentials like this
+    # {"user": "your_gbif_username", "password": "your_password", "email": "your.email@example.com"}
+    # It is added to gitignore to prevent sharing credentials. 
+genus: "Bombus"
+genus_key: 1340278
+countries: "PT,ES"

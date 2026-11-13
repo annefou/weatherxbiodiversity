@@ -1,0 +1,7 @@
+summary:
+  class: File
+  path: out/posterior_vb_summary.csv
+title: 'Phase 3 — Iberia regional replication of Soroye 2020'
+subtitle: 'Iberia, GBIF-observed Bombus species, ERA5 climate (1940-2014), 100 km grid'
+color: '#d7191c'
+output_dir: out

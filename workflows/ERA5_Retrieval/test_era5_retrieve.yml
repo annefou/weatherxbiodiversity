@@ -1,0 +1,10 @@
+# Small local test: the default variables (t2m mean, daily min mean, daily max
+# mean; tp sum) for 2020, over a 2 x 2 degree box around Madrid (~30 s).
+# Copy credentials.example.json to credentials.json and add your CDS API key.
+years: [2020, 2020]
+area:
+    - [41.5, -4.5, 39.5, -2.5]
+credentials_file:
+  class: File
+  path: credentials.json
+output_dir: results

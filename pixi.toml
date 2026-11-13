@@ -1,0 +1,32 @@
+[workspace]
+name = "weatherxbiodiversity"
+description = "Soroye et al. (2020) replication for Iberian Bombus with GBIF and ERA5 (same workflow as the ARC)"
+channels = ["conda-forge"]
+platforms = ["linux-64", "osx-64", "osx-arm64", "win-64"]
+
+# pixi.lock pins the exact versions: `pixi install` reproduces them.
+[dependencies]
+python = "3.12.*"
+pandas = ">=2.0"
+numpy = "*"
+scipy = "*"
+statsmodels = "*"
+pyarrow = "*"        # parquet model table (Analysis 05a)
+pyproj = "*"
+xarray = ">=2024.6"
+netcdf4 = "*"
+matplotlib = "*"
+requests = "*"
+zarr = ">=3"         # ERA5 from ECMWF's ARCO Zarr store
+fsspec = "*"
+aiohttp = "*"
+pyyaml = "*"
+# For the notebooks behind the Jupyter Book
+jupytext = "*"
+jupyterlab = "*"
+
+[pypi-dependencies]
+snakemake = ">=8"
+
+[tasks]
+workflow = "snakemake --cores 1"

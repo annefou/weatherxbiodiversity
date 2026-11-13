@@ -1,0 +1,17 @@
+# Published case (Soroye et al. 2020): baseline 1901-1974, recent 2000-2014,
+# same 100 km CEA raster as steps 02/03.
+# climate_dir: ERA5 variant produced by the ERA5 chain (ERA5_Retrieval ->
+# ERA5_Preprocessing -> workflows/util/make-climate-dir.cwl), containing
+# era5_{tmp,tmn,tmx,pre}_monthly_*.nc (climate_source: era5).
+presence_absence:
+  class: File
+  path: out/presence_absence.npz
+climate_dir:
+  class: Directory
+  path: ../../runs/ERA5_Preprocessing/results
+climate_source: era5
+years_baseline: ["1901", "1974"]
+years_recent: ["2000", "2014"]
+grid_resolution_m: 100000
+grid_bbox: ["-20037507", "20062493", "-5263885", "6336115"]
+output_dir: out

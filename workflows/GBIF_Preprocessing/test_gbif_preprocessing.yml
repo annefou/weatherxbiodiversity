@@ -1,0 +1,6 @@
+# Test job: the GBIF_Retrieval run results (genus Bombus, Spain and Portugal),
+# only the generic cleaning (no taxonomic curation tables).
+occurrences:
+  class: File
+  path: ../../runs/GBIF_Retrieval/results/gbif_data/occurrence.txt
+years: [1901, 2015]

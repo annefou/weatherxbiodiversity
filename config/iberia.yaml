@@ -1,0 +1,49 @@
+# Soroye et al. (2020) replication for Iberian Bombus: study parameters.
+# Same values as the ARC runs (runs/*/run.yml in WeatherXBiodiversity_Soroye2020).
+
+study: iberia
+
+gbif:
+  # Existing download, reused (no GBIF account needed): the Phase 3 download,
+  # GBIF.org (2026-04-25) https://doi.org/10.15468/dl.3frmsq (36,560 records).
+  # Set to null to request a new download with the query below (needs
+  # credentials/gbif_credentials.json).
+  download: 10.15468/dl.3frmsq
+  request:
+    genus: Bombus
+    genus_key: 1340278
+    countries: PT,ES
+  credentials: credentials/gbif_credentials.json
+  years: [1901, 2015]               # keep 1901 <= year < 2015
+
+study_tables: studies/soroye2020   # Kerr species list, synonyms, dropped taxa, erroneous observations
+
+era5:
+  years: [1940, 2014]              # ERA5 starts in 1940
+  # Boxes [north, west, south, east]: Spain and Portugal incl. the islands, 1 degree margin
+  area:
+    - [44.8, -10.6, 34.3, 5.3]     # mainland + Balearics
+    - [30.2, -19.2, 26.6, -12.5]   # Canaries
+    - [34.1, -18.4, 31.5, -15.3]   # Madeira + Selvagens
+    - [40.7, -32.3, 35.9, -24.0]   # Azores
+  credentials: credentials/cds_credentials.json
+
+# Climate sources for the Analysis: each writes the common climate input
+# (data/climate/<source>/<source>_{tmp,tmn,tmx,pre}_monthly_<start>_<end>.nc).
+climate:
+  era5:
+    years: [1940, 2014]
+    plot_title: "Iberian Bombus: Soroye et al. (2020) replication with ERA5"
+    plot_subtitle: "Iberia, GBIF-observed Bombus species, ERA5 climate (1940-2014), 100 km grid"
+    plot_color: "#d7191c"
+
+analysis:
+  sources: [era5]
+  continent: 2                     # Soroye's continent code for Europe
+  grid_resolution_m: 100000        # published 100 km cylindrical equal-area raster
+  grid_bbox: [-20037507, 20062493, -5263885, 6336115]
+  period_baseline: 0               # 1901-1974
+  period_recent: 3                 # 2000-2014
+  years_baseline: [1901, 1974]
+  years_recent: [2000, 2014]
+  seed: 42                         # variational Bayes fit (step 05b)

@@ -1,0 +1,15 @@
+# Small test: ERA5_Retrieval test outputs for 2020 over a 2 x 2 degree box around
+# Madrid (workflows/ERA5_Retrieval/test_era5_retrieve.yml), stored in test_data/.
+t2m_mean:
+  class: File
+  path: test_data/era5_t2m_mean_monthly_2020_2020.nc
+t2m_daily_min_mean:
+  class: File
+  path: test_data/era5_t2m_daily_min_mean_monthly_2020_2020.nc
+t2m_daily_max_mean:
+  class: File
+  path: test_data/era5_t2m_daily_max_mean_monthly_2020_2020.nc
+tp_sum:
+  class: File
+  path: test_data/era5_tp_sum_monthly_2020_2020.nc
+output_dir: results

@@ -5,43 +5,36 @@
 [![GBIF DOI](https://img.shields.io/badge/GBIF-10.15468%2Fdl.3frmsq-blue.svg)](https://doi.org/10.15468/dl.3frmsq)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
-Replication of [Soroye, Newbold & Kerr (2020, *Science*)](https://doi.org/10.1126/science.aax8591) for Iberian *Bombus* using open GBIF occurrence data and CRU TS climate.
+Replication of [Soroye, Newbold & Kerr (2020, *Science*)](https://doi.org/10.1126/science.aax8591) for Iberian *Bombus* using open GBIF occurrence data, with the paper's climate data (CRU TS) and with ERA5.
 
 **Claim under test**: increasing frequency of temperatures exceeding historical baselines predicts local extinction of bumblebee species.
 
 ## Structure
 
-> [!IMPORTANT]
-> The Copernicus API requires users to manually accept the licence for a dataset before it can be retrieved.
-> If a `403` error with the text `requested licences not accepted` is encountered, please login to
-> the Copernicus CDS website and manually accept the required licence. Accepting a licence in this way
-> enables the download of all datasets using this licence without further manual action being required.
-
 ```
 weatherxbiodiversity/
-├── notebooks/                  Upstream data-download notebooks (jupytext)
-│   ├── 01_download_gbif.py     GBIF Bombus records for Iberia (~36k)
-│   ├── 01b_gbif_download_doi.py
-│   │                           Citable GBIF download (DOI 10.15468/dl.3frmsq)
-│   ├── 02_download_era5.py     ERA5 monthly max T via the CDS queue (~27 h)
-│   ├── 02b_stream_era5_arco.py Same field streamed from ECMWF ARCO Zarr (~1 min)
-│   └── 02c_stream_era5_monthly_climate.py
-│                               ERA5 monthly tmp/tmn/tmx/pre with CRU TS definitions (ARCO Zarr)
-├── data/                       Processed data
-├── reference/Bumblebee_repo_wbombusdat/
-│                               Soroye et al.'s Figshare dataset (R scripts + CRU TS)
-└── soroye_port/                Faithful Python port of Soroye's R pipeline
-    ├── 01_clean_data.py + 01_clean_data_iberia.py
-    ├── 02_presence_absence.py
-    ├── 03_sampling_continent.py
-    ├── 04_climate_tei_pei.py
-    ├── 05b_regression_statsmodels.py
-    ├── plot_forest.py
-    ├── outputs/                Phase 2 run on Soroye's global data (validation)
-    ├── outputs_iberia/         Phase 3 run on Iberia GBIF + CRU TS (replication)
-    ├── phase2_forest.png
-    └── phase3_forest.png
+├── Snakefile                  The workflow: GBIF + climate -> analysis (pixi run snakemake)
+├── config/iberia.yaml         Study parameters (GBIF download, years, ERA5 boxes, grid, seed)
+├── workflows/                 One folder per step, same scripts and CWL as the ARC
+│   ├── GBIF_Retrieval/        Existing GBIF download (key/DOI) or a new request
+│   ├── GBIF_Preprocessing/    Generic cleaning of the occurrence table
+│   ├── ERA5_Retrieval/        Monthly ERA5 statistics from ECMWF's ARCO Zarr store
+│   ├── ERA5_Preprocessing/    Monthly tmp/tmn/tmx/pre (common climate input format)
+│   ├── Analysis/              01 study records ... 06 forest plot (Soroye et al. 2020)
+│   └── orchestration.cwl      The whole chain in CWL
+├── studies/soroye2020/        Study tables (species list, synonyms, dropped taxa,
+│                              erroneous observations; CC BY 4.0, Soroye et al. deposit)
+├── credentials/               Templates; your credentials files here are git-ignored
+├── soroye_port/               Original Python port behind Phases 2 and 3 of the book
+│                              (its own Snakefile: snakemake -s soroye_port/Snakefile)
+├── notebooks/                 Data-download notebooks of the original port (jupytext)
+└── *.md, myst.yml             The Jupyter Book (https://annefou.github.io/weatherxbiodiversity/)
 ```
+
+The workflow is the same as in the
+[ARC](https://git.nfdi4plants.org/lifewatch-eric/WeatherXBiodiversity_Soroye2020)
+(DataHUB): each step has its script, a CWL tool description and a Dockerfile;
+here they are run with Snakemake (each step's `rules.smk`), in the ARC with CWL.
 
 ## Method
 
@@ -68,54 +61,44 @@ See `soroye_port/phase2_forest.png` and `phase3_forest.png` for full coefficient
 ## Quick start
 
 ```bash
-# Create environment
-mamba env create -f environment.yml
-mamba activate weatherxbio
+# 1. Environment, pinned by pixi.lock (Linux, macOS, Windows)
+pixi install
 
-# Download data (one-off, slow)
-cd notebooks
-python 02b_stream_era5_arco.py           # ERA5 from ECMWF's ARCO Zarr (CDS key, ~1 min)
-# or the same field via the CDS queue (66 one-year requests, ~27 h):
-# python 02_download_era5.py
-cd ..
-# and (GBIF — needs GBIF_USER/GBIF_PWD/GBIF_EMAIL set)
-cd notebooks
-# 01b mints the citable DOI and saves metadata, it does NOT download the data:
-python 01b_gbif_download_doi.py
-# fetch the zipped snapshot it just registered, and unpack where the pipeline expects it:
-mkdir -p ../data/gbif_dl
-curl -L -o ../data/gbif_dl/<download_key>.zip \
-  "https://api.gbif.org/v1/occurrence/download/request/<download_key>.zip"
-unzip -q ../data/gbif_dl/<download_key>.zip -d ../data/gbif_dl/
-# (the exact <download_key> and URL are printed by 01b)
-cd ..
+# 2. CDS API key for ERA5 (https://cds.climate.copernicus.eu/profile; accept the
+#    ERA5 licence on the CDS website first). The file is git-ignored.
+cp credentials/cds_credentials.example.json credentials/cds_credentials.json
+#    then put your key in it: {"key": "..."}
 
-# Run the port end to end
-snakemake --cores 1
-# or step by step:
-cd soroye_port
-python 01_clean_data_iberia.py
-OUT_SUBDIR=outputs_iberia python 02_presence_absence.py
-OUT_SUBDIR=outputs_iberia python 03_sampling_continent.py
-OUT_SUBDIR=outputs_iberia python 04_climate_tei_pei.py
-OUT_SUBDIR=outputs_iberia python 05a_build_dataGLMM.py
-OUT_SUBDIR=outputs_iberia python 05b_regression_statsmodels.py
-python plot_forest.py
+# 3. Run the whole workflow (the ERA5 retrieval takes about 1.5 hours)
+pixi run snakemake --cores 1
+pixi run snakemake --cores 1 -n                  # dry run
+pixi run snakemake --cores 1 gbif_preprocessing  # one step (rule names in workflows/*/rules.smk)
 ```
 
-Scripts 02–05 take an `OUT_SUBDIR` env var (default `outputs`) to switch between the Phase-2 (global Soroye) and Phase-3 (Iberia) runs.
+The GBIF occurrences are the published Phase 3 download
+([10.15468/dl.3frmsq](https://doi.org/10.15468/dl.3frmsq)), fetched without a
+GBIF account. For a new download, set `gbif.download: null` in
+`config/iberia.yaml` and provide `credentials/gbif_credentials.json`.
+
+Results go to `results/iberia/` (git-ignored): `gbif/occurrences_clean.csv`,
+`common/` (study records, presence/absence, sampling effort) and, per climate
+source, `era5/` (TEI/PEI, model table, `posterior_vb_summary.csv`, `forest.png`).
+Downloads go to `data/`.
 
 ## Prerequisites
 
-- CDS API key in `~/.cdsapirc` ([register here](https://cds.climate.copernicus.eu/))
-- Internet access for GBIF and CDS
-- Soroye et al.'s Figshare dataset (~1.1 GB zip) at `reference/Bumblebee_repo.zip`, extracted to `reference/Bumblebee_repo_wbombusdat/` — includes the CRU TS climate required by script 04
+- [pixi](https://pixi.sh) (installs Python, Snakemake and all packages from `pixi.lock`)
+- an internet connection (GBIF download, ERA5 from ECMWF's ARCO store)
+- a [CDS account](https://cds.climate.copernicus.eu/) and its API key, with the
+  ERA5 licence accepted (otherwise the store answers `403`)
+- a [GBIF account](https://www.gbif.org) only for a new GBIF download
 
 ## Data sources
 
-- **Biodiversity**: [GBIF Occurrence Download — *Bombus* in Spain + Portugal, georeferenced, no geospatial issues, 36,560 records](https://doi.org/10.15468/dl.3frmsq) — citation: *GBIF.org (2026-04-25) GBIF Occurrence Download https://doi.org/10.15468/dl.3frmsq* — DOI minted by `notebooks/01b_gbif_download_doi.py` (which saves the metadata only, not the data); the zip fetched from `https://api.gbif.org/v1/occurrence/download/request/0006204-260423192947929.zip` and unpacked in `data/gbif_dl/`
-- **Climate**: CRU TS 3.24.01 monthly (from Soroye's Figshare deposit) — used for both Phase 2 and Phase 3 to isolate region as the only swap variable
-- **Climate (future extension)**: [ERA5 via CDS](https://cds.climate.copernicus.eu/) — for a future sensitivity run; either downloaded via the CDS queue (`notebooks/02_download_era5.py`) or streamed from ECMWF's ARCO Zarr store of [`reanalysis-era5-single-levels`](https://cds.climate.copernicus.eu/datasets/reanalysis-era5-single-levels) (`notebooks/02b_stream_era5_arco.py`, `notebooks/02c_stream_era5_monthly_climate.py`)
+- **Biodiversity**: [GBIF Occurrence Download, *Bombus* in Spain and Portugal, georeferenced, no geospatial issues, 36,560 records](https://doi.org/10.15468/dl.3frmsq). Citation: *GBIF.org (2026-04-25) GBIF Occurrence Download https://doi.org/10.15468/dl.3frmsq* (licence CC BY-NC 4.0).
+- **Climate, workflow**: [ERA5 hourly data on single levels](https://doi.org/10.24381/cds.adbb2d47) (CC BY 4.0), 1940–2014, streamed from ECMWF's ARCO Zarr store and aggregated to monthly statistics.
+- **Climate, Phases 2 and 3 of the book**: CRU TS 3.24.01 monthly, as used by Soroye et al. (2020), from their data deposit (run by `soroye_port/`).
+- **Study tables**: from the data deposit of Soroye et al. (2020), [10.6084/m9.figshare.9956471](https://doi.org/10.6084/m9.figshare.9956471) (CC BY 4.0), in `studies/soroye2020/`.
 
 ## How to cite
 
