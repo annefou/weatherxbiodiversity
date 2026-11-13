@@ -1,14 +1,10 @@
-name: CI smoke run
+name: Phase 2 port (manual, Figshare)
 
+# Original Python port (Phase 2, Soroye et al.'s global data with CRU TS from
+# their Figshare deposit): manual only. The workflow itself is tested by
+# workflow.yml, without Figshare.
 on:
-  push:
-    branches: [main]
-  pull_request:
-    branches: [main]
   workflow_dispatch:
-
-# Smoke test: runs Phase 2 (port on Soroye's data) from the extracted bumblebee
-# dataset. Downloads Soroye's 1.1 GB Figshare zip once and caches it.
 
 jobs:
   run:

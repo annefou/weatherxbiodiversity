@@ -1,0 +1,6 @@
+# Small ERA5 retrieval for CI (one year, one 1x1 degree box near Madrid).
+era5:
+  years: [2020, 2020]
+  area:
+    - [41.0, -4.0, 40.0, -3.0]
+  credentials: credentials/cds_credentials.json
