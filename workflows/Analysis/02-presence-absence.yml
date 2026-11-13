@@ -1,0 +1,11 @@
+# Published case: Soroye et al. (2020) 100 km CEA raster (NA + Europe),
+# baseline period 0 (1901-1974), recent period 3 (2000-2014).
+# records: output of 01-study-records.cwl.
+records:
+  class: File
+  path: out/clean_records.csv
+grid_resolution_m: 100000
+grid_bbox: ["-20037507", "20062493", "-5263885", "6336115"]
+period_baseline: 0
+period_recent: 3
+output_dir: out

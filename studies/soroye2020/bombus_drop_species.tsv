@@ -1,0 +1,14 @@
+# Taxa removed from the occurrence records in the published Bombus replication
+# (non-Bombus records and obsolete genus names).
+# Source: Soroye et al. (2020), 1_Cleandata_and_makeMCPs.R, in
+# Bumblebee_repo_wbombusdat (figshare 10.6084/m9.figshare.9956471); reasons
+# are the original code comments. For a study of a different genus, supply an
+# equivalent file (or none).
+species	reason
+x.virginica	
+megachile_sculpturalis	non-Bombus (1 obs)
+fernaldaepsithyrus	old genus (10 obs)
+subterraneobombus	old genus (1 obs)
+psithyrus	old genus (3 obs)
+laesobombus	old genus (4 obs)
+allopsithyrus	old genus (93 obs)

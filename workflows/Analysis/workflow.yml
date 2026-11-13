@@ -1,0 +1,36 @@
+# Published case: Iberian Bombus (Soroye et al. 2020 replication)
+# Full analysis chain via workflow.cwl. Paths relative to the data root
+# (same convention as the per-step .yml files); genus/years/grid/periods
+# given ONCE here for the whole study.
+# Prerequisites on a fresh clone: the results of the GBIF chain
+# (runs/GBIF_Retrieval -> runs/GBIF_Preprocessing) and of the ERA5 chain
+# (runs/ERA5_Retrieval -> runs/ERA5_Preprocessing), committed with Git LFS,
+# or run runs/FullWorkflow for the whole chain in one shot.
+# occurrences: cleaned GBIF occurrences (GBIF_Preprocessing run results).
+# err_obs: study curation table in studies/BombusIberia_SupplementaryFiles/resources/.
+# climate_dir: directory containing era5_{tmp,tmn,tmx,pre}_monthly_*.nc,
+# produced by the ERA5 chain (ERA5_Retrieval -> ERA5_Preprocessing, committed
+# under runs/ERA5_Preprocessing/results/, or generated from scratch by
+# runs/FullWorkflow). For a study without those files, supply your own
+# climate_dir and matching climate_source.
+occurrences:
+  class: File
+  path: ../../runs/GBIF_Preprocessing/results/occurrences_clean.csv
+err_obs:
+  class: File
+  path: ../../studies/BombusIberia_SupplementaryFiles/resources/bombus_err_obs.csv
+continent: 2
+grid_resolution_m: 100000
+grid_bbox: ["-20037507", "20062493", "-5263885", "6336115"]
+period_baseline: 0
+period_recent: 3
+climate_dir:
+  class: Directory
+  path: ../../runs/ERA5_Preprocessing/results
+climate_source: era5
+years_baseline: ["1901", "1974"]
+years_recent: ["2000", "2014"]
+seed: 42
+plot_title: "Phase 3 — Iberia regional replication of Soroye 2020"
+plot_subtitle: "Iberia, GBIF-observed Bombus species, ERA5 climate (1940-2014), 100 km grid"
+plot_color: "#d7191c"

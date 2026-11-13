@@ -1,0 +1,9 @@
+# Published case: same 100 km CEA raster and periods as 02-presence-absence.
+records:
+  class: File
+  path: out/clean_records.csv
+grid_resolution_m: 100000
+grid_bbox: ["-20037507", "20062493", "-5263885", "6336115"]
+period_baseline: 0
+period_recent: 3
+output_dir: out

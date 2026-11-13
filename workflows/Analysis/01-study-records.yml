@@ -1,0 +1,12 @@
+# Published case: Iberian Bombus (Soroye et al. 2020 replication)
+# occurrences: output of the GBIF_Preprocessing run (cleaned GBIF download of
+# genus Bombus in PT+ES).
+# err_obs: study curation table in studies/BombusIberia_SupplementaryFiles/resources/.
+occurrences:
+  class: File
+  path: ../../runs/GBIF_Preprocessing/results/occurrences_clean.csv
+err_obs:
+  class: File
+  path: ../../studies/BombusIberia_SupplementaryFiles/resources/bombus_err_obs.csv
+continent: 2
+output_dir: out

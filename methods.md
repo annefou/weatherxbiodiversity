@@ -129,5 +129,5 @@ remains valid for citation.
   CI uses `mamba-org/setup-micromamba@v3` with the same file.
 - Container: `Dockerfile` builds an image with the full pipeline; archived
   as a citable Docker image on Zenodo.
-- Pipeline orchestration: `Snakefile`. CI workflow runs the Phase 2 port
+- Pipeline orchestration: `soroye_port/Snakefile` (the maintained workflow is the root `Snakefile`, same scripts as the ARC). CI workflow runs the Phase 2 port
   end-to-end on every push.

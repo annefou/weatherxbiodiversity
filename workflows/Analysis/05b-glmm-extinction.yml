@@ -1,0 +1,5 @@
+data:
+  class: File
+  path: out/dataGLMM_extinction.parquet
+seed: 42
+output_dir: out
