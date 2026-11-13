@@ -84,9 +84,9 @@ rule analysis_06_forest_plot:
     output:
         f"{RES}/{{source}}/forest.png",
     params:
-        title=lambda wc: config["climate"][wc.source]["plot_title"],
-        subtitle=lambda wc: config["climate"][wc.source]["plot_subtitle"],
-        color=lambda wc: config["climate"][wc.source]["plot_color"],
+        title=lambda wc: shlex.quote(config["climate"][wc.source]["plot_title"]),
+        subtitle=lambda wc: shlex.quote(config["climate"][wc.source]["plot_subtitle"]),
+        color=lambda wc: shlex.quote(config["climate"][wc.source]["plot_color"]),
     shell:
-        "python {A}/06_forest_plot.py --summary {input} --title '{params.title}' "
-        "--subtitle '{params.subtitle}' --color '{params.color}' --output-dir {RES}/{wildcards.source}"
+        "python {A}/06_forest_plot.py --summary {input} --title {params.title} "
+        "--subtitle {params.subtitle} --color {params.color} --output-dir {RES}/{wildcards.source}"

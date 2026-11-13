@@ -23,8 +23,12 @@
 # CDS API key for ERA5; GBIF account only for a new GBIF download.
 
 import json
+import shlex
 
 configfile: "config/iberia.yaml"
+
+wildcard_constraints:
+    source="[A-Za-z0-9_]+",   # a climate source name, never a path
 
 DATA = "data"
 RES = f"results/{config['study']}"
@@ -53,3 +57,5 @@ rule all:
         expand(f"{RES}/{{source}}/forest.png", source=config["analysis"]["sources"]),
         f"{RES}/comparison/coefficients.csv",
         f"{RES}/comparison/forest_comparison.png",
+        f"{RES}/comparison/common_rows/coefficients.csv",
+        f"{RES}/comparison/common_rows/forest_comparison.png",

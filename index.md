@@ -24,10 +24,18 @@ coefficient ~3× larger in magnitude than the continental mean.
 |---|---|---:|---:|:---:|
 | 2 — Reproduction | Soroye continental data | 13 614 | **+0.15** | [0.12, 0.19] |
 | 3 — Replication | Iberian *Bombus* via [GBIF](https://doi.org/10.15468/dl.3frmsq) | 528 | **+0.48** | [0.27, 0.69] |
+| 4 — Climate data | Same Iberian records, **ERA5** instead of CRU TS | 528 / 679 | **+0.05** / **−0.05** | [−0.16, 0.26] / [−0.24, 0.14] |
 
 The mechanism Soroye describes is real, and on the warm-edge subregion of
 Iberia it is *stronger* — exactly what one would predict if species reaching
 their thermal limit are most vulnerable to thermal-exposure events.
+
+**But the regional replication depends on the climate dataset**
+([Phase 4](phase4.md)): with ERA5 instead of CRU TS, on the same records and
+with the same code, the effect of warming is not detectable (+0.05 on the same
+528 rows, −0.05 on ERA5's 679 rows), while CRU TS restricted to ERA5's years
+still gives +0.46. Neither the baseline period nor the coverage explains the
+difference.
 
 ## The full FORRT chain
 
@@ -79,6 +87,7 @@ The next pages walk through each layer.
 - [The Claim](claim.md) — Quote, AIDA, FORRT Claim
 - [Phase 2 — Reproduction on Soroye's data](phase2.md)
 - [Phase 3 — Iberian replication](phase3.md)
+- [Phase 4 — Climate data sensitivity: CRU TS vs ERA5](phase4.md)
 - [Methods](methods.md) — Python port, grid, TEI/PEI, GLMM
 - [Discussion](discussion.md) — Why is Iberia stronger? What's next?
 - [References](references.md)

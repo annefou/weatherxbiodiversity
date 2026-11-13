@@ -13,6 +13,7 @@ project:
     - file: claim.md
     - file: phase2.md
     - file: phase3.md
+    - file: phase4.md
     - file: methods.md
     - file: discussion.md
     - file: references.md
