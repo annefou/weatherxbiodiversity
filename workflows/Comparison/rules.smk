@@ -12,7 +12,8 @@ rule comparison:
         sources=" ".join(f"--source {s} {RES}/{s} {shlex.quote(config['climate'][s]['label'])}" for s in config["analysis"]["sources"]),
     shell:
         "python {W}/Comparison/compare_sources.py {params.sources} "
-        "--title 'Iberian Bombus: the same analysis with two climate datasets' --output-dir {RES}/comparison"
+        "--title " + shlex.quote(config.get("comparison", {}).get("title", "Iberian Bombus: the same analysis with two climate datasets")) +
+        " --output-dir {RES}/comparison"
 
 
 # Same rows: every source restricted to the species x grid-cell rows common to
@@ -54,7 +55,8 @@ rule comparison_common:
         sources=" ".join(f"--source {s} {COMMON}/{s} {shlex.quote(config['climate'][s]['label'])}" for s in config["analysis"]["sources"]),
     shell:
         "python {W}/Comparison/compare_sources.py {params.sources} "
-        "--title 'Iberian Bombus: two climate datasets on the same rows' --output-dir {COMMON}"
+        "--title " + shlex.quote(config.get("comparison", {}).get("title_common_rows", "Iberian Bombus: two climate datasets on the same rows")) +
+        " --output-dir {COMMON}"
 
 
 # Climate sources that are another source restricted to a period

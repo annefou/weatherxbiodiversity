@@ -50,6 +50,9 @@ extinction is not detectable, on all its rows and on exactly the rows CRU TS
 covers. **The Iberian replication of Soroye's claim depends on the climate
 dataset**, not on the baseline period or on the coverage.
 
+This concerns the Iberian replication only. On Soroye et al.'s continental
+data, the claim holds with ERA5 as well ([Phase 5](phase5.md)).
+
 ```{figure} figures/phase4_forest_common_rows.png
 :alt: Forest plot of all model coefficients for CRU TS, CRU TS restricted to 1940-2014, and ERA5, on the same 528 rows
 :width: 100%

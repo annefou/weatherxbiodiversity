@@ -15,15 +15,18 @@ Replication of [Soroye, Newbold & Kerr (2020, *Science*)](https://doi.org/10.112
 weatherxbiodiversity/
 ├── Snakefile                  The workflow: GBIF + climate -> analysis (pixi run snakemake)
 ├── config/iberia.yaml         Study parameters (GBIF download, years, ERA5 boxes, grid, seed)
+├── config/continental.yaml    Phase 5: Soroye et al.'s continental records, CRU TS and ERA5
 ├── workflows/                 One folder per step, same scripts and CWL as the ARC
 │   ├── GBIF_Retrieval/        Existing GBIF download (key/DOI) or a new request
 │   ├── GBIF_Preprocessing/    Generic cleaning of the occurrence table
 │   ├── ERA5_Retrieval/        Monthly ERA5 statistics from ECMWF's ARCO Zarr store
+│   │                          (boxes, or only the tiles around the grid cells with records)
 │   ├── ERA5_Preprocessing/    Monthly tmp/tmn/tmx/pre (common climate input format)
 │   ├── CRU_Retrieval/         CRU TS 3.24.01 (the paper's climate data) from UEA
 │   ├── CRU_Preprocessing/     The same variables from CRU TS (common climate input format)
 │   ├── Analysis/              01 study records ... 06 forest plot (Soroye et al. 2020)
 │   ├── Comparison/            The climate sources side by side
+│   ├── Soroye_Records/        Soroye et al.'s own records instead of GBIF (Phase 5)
 │   └── orchestration.cwl      The whole chain in CWL
 ├── studies/soroye2020/        Study tables (species list, synonyms, dropped taxa,
 │                              erroneous observations; CC BY 4.0, Soroye et al. deposit)
@@ -72,6 +75,17 @@ not on the baseline period (CRU TS on ERA5's years still replicates) or the
 coverage (CRU TS is land-only; on the same 528 rows ERA5 still does not
 replicate). See [Phase 4](https://annefou.github.io/weatherxbiodiversity/phase4/)
 and `results/iberia/comparison/` after a run.
+
+**Continental data with ERA5** — Soroye et al.'s own records (North America + Europe, 66 species), same code, with `config/continental.yaml`:
+
+| Climate data | `sc_TEI_delta`, all rows | Rows | Same 13,614 rows | Claim |
+|---|---|---|---|---|
+| CRU TS 3.24.01 (paper) | **+0.15 [0.12, 0.19]** | 13,614 | +0.15 | reproduces |
+| CRU TS, 1940–2014 only | **+0.19 [0.15, 0.22]** | 13,614 | +0.19 | holds |
+| ERA5 (1940–2014) | **+0.14 [0.10, 0.17]** | 15,268 | +0.11 [0.07, 0.15] | holds |
+
+Soroye's continental claim holds with ERA5; only the small Iberian replication
+depends on the climate dataset. See [Phase 5](https://annefou.github.io/weatherxbiodiversity/phase5/).
 
 See `soroye_port/phase2_forest.png` and `phase3_forest.png` for full coefficient forest plots.
 
