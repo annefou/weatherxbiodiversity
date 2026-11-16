@@ -1,0 +1,67 @@
+# Phase 5: Soroye et al. (2020) on their own continental records (North America
+# + Europe, 66 Bombus species), with the paper's climate data (CRU TS) and with
+# ERA5. Phase 2 reproduced the paper with CRU TS on these records; this asks
+# whether the claim also holds with ERA5.
+#
+#   pixi run snakemake --configfile config/continental.yaml --cores 4
+#
+# The records come from Soroye et al.'s data deposit (Figshare,
+# https://doi.org/10.6084/m9.figshare.9956471), unpacked under
+# soroye_records.bundle; no GBIF download.
+
+study: continental
+data_dir: data/continental         # downloads kept apart from the Iberian ones
+
+soroye_records:
+  bundle: reference/Bumblebee_repo_wbombusdat
+
+study_tables: studies/soroye2020
+
+era5:
+  years: [1940, 2014]              # ERA5 starts in 1940
+  # Only the ARCO store tiles around the study grid cells with records
+  # (about 3,000 1-degree tiles over the two continents), not whole boxes.
+  grid_cells:
+    buffer: 0.5                    # degrees around each cell centre (bilinear interpolation)
+  credentials: credentials/cds_credentials.json
+
+cru:
+  decades: ["1901.1910", "1911.1920", "1921.1930", "1931.1940", "1941.1950", "1951.1960",
+            "1961.1970", "1971.1980", "1991.2000", "2001.2010", "2011.2015"]
+  bbox: [75, -170, 14, 35]         # [north, west, south, east]: the cells with records, with a margin
+
+climate:
+  cru:
+    label: "CRU TS 3.24.01 (paper)"
+    years: [1901, 2015]
+    plot_title: "Bombus, North America + Europe: Soroye et al. (2020) with CRU TS"
+    plot_subtitle: "Soroye et al.'s records (66 species), CRU TS 3.24.01 climate (1901-2015), 100 km grid"
+    plot_color: "#2b83ba"
+  cru_1940:
+    period_of: cru
+    label: "CRU TS, 1940-2014 only"
+    years: [1940, 2014]
+    plot_title: "Bombus, North America + Europe: CRU TS restricted to ERA5's years (1940-2014)"
+    plot_subtitle: "Soroye et al.'s records (66 species), CRU TS 3.24.01 climate (1940-2014), 100 km grid"
+    plot_color: "#7b3294"
+  era5:
+    label: "ERA5"
+    years: [1940, 2014]
+    plot_title: "Bombus, North America + Europe: Soroye et al. (2020) with ERA5"
+    plot_subtitle: "Soroye et al.'s records (66 species), ERA5 climate (1940-2014), 100 km grid"
+    plot_color: "#d7191c"
+
+comparison:
+  title: "Bombus, North America + Europe: the same analysis with two climate datasets"
+  title_common_rows: "Bombus, North America + Europe: two climate datasets on the same rows"
+
+analysis:
+  sources: [cru, cru_1940, era5]
+  continent: 2                     # not used: continents come with the records (1: North America, 2: Europe)
+  grid_resolution_m: 100000
+  grid_bbox: [-20037507, 20062493, -5263885, 6336115]
+  period_baseline: 0
+  period_recent: 3
+  years_baseline: [1901, 1974]
+  years_recent: [2000, 2014]
+  seed: 42

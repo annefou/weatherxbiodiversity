@@ -30,7 +30,7 @@ configfile: "config/iberia.yaml"
 wildcard_constraints:
     source="[A-Za-z0-9_]+",   # a climate source name, never a path
 
-DATA = "data"
+DATA = config.get("data_dir", "data")   # downloads; one folder per study region
 RES = f"results/{config['study']}"
 W = "workflows"
 STUDY = config["study_tables"]
@@ -41,14 +41,17 @@ def climate_files(source):
     return [f"{DATA}/climate/{source}/{source}_{v}_monthly_{y0}_{y1}.nc" for v in ("tmp", "tmn", "tmx", "pre")]
 
 
-include: f"{W}/GBIF_Retrieval/rules.smk"
-include: f"{W}/GBIF_Preprocessing/rules.smk"
+if "gbif" in config:
+    include: f"{W}/GBIF_Retrieval/rules.smk"
+    include: f"{W}/GBIF_Preprocessing/rules.smk"
 include: f"{W}/ERA5_Retrieval/rules.smk"
 include: f"{W}/ERA5_Preprocessing/rules.smk"
 include: f"{W}/CRU_Retrieval/rules.smk"
 include: f"{W}/CRU_Preprocessing/rules.smk"
 include: f"{W}/Analysis/rules.smk"
 include: f"{W}/Comparison/rules.smk"
+if "soroye_records" in config:   # Soroye et al.'s own records instead of a GBIF download
+    include: f"{W}/Soroye_Records/rules.smk"
 
 
 rule all:
